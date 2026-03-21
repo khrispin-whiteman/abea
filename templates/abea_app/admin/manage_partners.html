@@ -1,0 +1,424 @@
+<!-- templates/abea_app/admin/manage_partners.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Manage Partners" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 mb-0" style="color: var(--primary-green);">{% trans "Manage Partners" %}</h1>
+        <a href="{% url 'add_partner' %}" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+            <i class="fas fa-plus me-2"></i> {% trans "Add Partner" %}
+        </a>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+            <h5 class="mb-0">{% trans "Filter Partners" %}</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control"
+                           placeholder="{% trans 'Search by name, description or country...' %}"
+                           value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="type" class="form-select">
+                        <option value="">{% trans "All Types" %}</option>
+                        {% for type_key, type_name in partner_types %}
+                        <option value="{{ type_key }}" {% if selected_type == type_key %}selected{% endif %}>
+                            {{ type_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="active" class="form-select">
+                        <option value="">{% trans "All Status" %}</option>
+                        <option value="true" {% if selected_active == 'true' %}selected{% endif %}>
+                            {% trans "Active Only" %}
+                        </option>
+                        <option value="false" {% if selected_active == 'false' %}selected{% endif %}>
+                            {% trans "Inactive Only" %}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn w-100" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                        <i class="fas fa-filter me-1"></i> {% trans "Filter" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Partners Grid -->
+    {% if partners %}
+    <div class="row g-4">
+        {% for partner in partners %}
+        <div class="col-xl-4 col-lg-6">
+            <div class="card h-100" style="border: 2px solid var(--primary-green); border-radius: 12px; overflow: hidden;">
+                <div class="card-body">
+                    <!-- Partner Header -->
+                    <div class="text-center mb-4">
+                        {% if partner.logo %}
+                        <img src="{{ partner.logo.url }}" alt="{{ partner.name }}"
+                             class="img-fluid mb-3" style="max-height: 100px; object-fit: contain;">
+                        {% else %}
+                        <div class="mb-3" style="height: 100px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-handshake fa-3x" style="color: var(--primary-green);"></i>
+                        </div>
+                        {% endif %}
+                        <h5 style="color: var(--dark-gray);">{{ partner.name }}</h5>
+                        <div class="d-flex justify-content-center gap-2 mb-2">
+                            <span class="badge" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                {{ partner.get_partner_type_display }}
+                            </span>
+                            {% if partner.partnership_active %}
+                            <span class="badge" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                {% trans "Active" %}
+                            </span>
+                            {% else %}
+                            <span class="badge" style="background: linear-gradient(135deg, var(--medium-gray), #666); color: white;">
+                                {% trans "Inactive" %}
+                            </span>
+                            {% endif %}
+                            {% if partner.show_on_homepage %}
+                            <span class="badge" style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800); color: #333;">
+                                <i class="fas fa-home me-1"></i>{% trans "Homepage" %}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Partner Details -->
+                    <div class="mb-3">
+                        <p class="small text-muted mb-1">{% trans "Description" %}</p>
+                        <p class="mb-2" style="color: var(--dark-gray); font-size: 0.9rem;">
+                            {{ partner.description|truncatewords:20 }}
+                        </p>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="mb-3">
+                        <p class="small text-muted mb-1">{% trans "Contact Information" %}</p>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="d-block">{% trans "Country" %}</small>
+                                <strong style="color: var(--primary-green);">{{ partner.country }}</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="d-block">{% trans "Partnership Date" %}</small>
+                                <strong style="color: var(--primary-green);">{{ partner.partnership_date|date:"M d, Y" }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <div class="text-muted small">
+                            {% trans "Display Order" %}: {{ partner.display_order }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm toggle-active-btn"
+                                    data-partner-id="{{ partner.id }}"
+                                    data-is-active="{{ partner.partnership_active|yesno:'true,false' }}"
+                                    style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800); border: none; color: #333;"
+                                    title="{% if partner.partnership_active %}{% trans 'Deactivate' %}{% else %}{% trans 'Activate' %}{% endif %}">
+                                <i class="fas {% if partner.partnership_active %}fa-toggle-on{% else %}fa-toggle-off{% endif %}"></i>
+                            </button>
+                            <button class="btn btn-sm toggle-homepage-btn"
+                                    data-partner-id="{{ partner.id }}"
+                                    data-on-homepage="{{ partner.show_on_homepage|yesno:'true,false' }}"
+                                    style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); border: none; color: white;"
+                                    title="{% if partner.show_on_homepage %}{% trans 'Remove from Homepage' %}{% else %}{% trans 'Show on Homepage' %}{% endif %}">
+                                <i class="fas {% if partner.show_on_homepage %}fa-home{% else %}fa-house-user{% endif %}"></i>
+                            </button>
+                            <a href="{% url 'edit_partner' partner.id %}" class="btn btn-sm"
+                               style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); border: none; color: white;"
+                               title="{% trans 'Edit' %}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'delete_partner' partner.id %}" class="btn btn-sm"
+                               style="background: linear-gradient(135deg, #666, #333); border: none; color: white;"
+                               title="{% trans 'Delete' %}">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <div class="mb-3">
+                <i class="fas fa-handshake fa-3x" style="color: var(--primary-green);"></i>
+            </div>
+            <h5 style="color: var(--primary-green);">{% trans "No partners found" %}</h5>
+            <p class="text-muted mb-4">
+                {% if search_query or selected_type or selected_active %}
+                {% trans "Try changing your search criteria." %}
+                {% else %}
+                {% trans "Add your first partner to get started." %}
+                {% endif %}
+            </p>
+            <a href="{% url 'add_partner' %}" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                <i class="fas fa-plus me-2"></i> {% trans "Add Partner" %}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if partners.has_other_pages %}
+    <nav aria-label="Partners pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if partners.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ partners.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_active %}&active={{ selected_active }}{% endif %}" style="color: var(--primary-green);">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+            </li>
+            {% endif %}
+
+            {% for i in partners.paginator.page_range %}
+                {% if partners.number == i %}
+                <li class="page-item active">
+                    <span class="page-link" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border-color: var(--primary-green);">{{ i }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_active %}&active={{ selected_active }}{% endif %}" style="color: var(--primary-green);">
+                        {{ i }}
+                    </a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if partners.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ partners.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_active %}&active={{ selected_active }}{% endif %}" style="color: var(--primary-green);">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.4em 0.8em;
+        border-radius: 20px;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    }
+
+    .page-link {
+        color: var(--primary-green);
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin: 0 3px;
+        transition: all 0.3s ease;
+    }
+
+    .page-link:hover {
+        color: white;
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+    .page-item.active .page-link {
+        color: white;
+        border-color: var(--primary-green);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Toggle partner active status
+        document.querySelectorAll('.toggle-active-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const partnerId = this.dataset.partnerId;
+                const isActive = this.dataset.isActive === 'true';
+
+                const confirmMessage = isActive
+                    ? "{% trans 'Are you sure you want to deactivate this partnership?' %}"
+                    : "{% trans 'Are you sure you want to activate this partnership?' %}";
+
+                if (!confirm(confirmMessage)) return;
+
+                fetch("{% url 'toggle_partner_active' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: `partner_id=${partnerId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('success', data.message || 'Status updated successfully!');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showAlert('danger', data.error || 'An error occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('danger', 'An error occurred while processing your request.');
+                });
+            });
+        });
+
+        // Toggle homepage status
+        document.querySelectorAll('.toggle-homepage-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const partnerId = this.dataset.partnerId;
+                const onHomepage = this.dataset.onHomepage === 'true';
+
+                const confirmMessage = onHomepage
+                    ? "{% trans 'Are you sure you want to remove this partner from homepage?' %}"
+                    : "{% trans 'Are you sure you want to show this partner on homepage?' %}";
+
+                if (!confirm(confirmMessage)) return;
+
+                fetch(`/partners/${partnerId}/toggle-homepage/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ partner_id: partnerId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('success', data.message || 'Homepage status updated!');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showAlert('danger', data.error || 'An error occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('danger', 'An error occurred while processing your request.');
+                });
+            });
+        });
+
+        // Show alert function
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; min-width: 300px;';
+
+            if (type === 'success') {
+                alertDiv.style.borderLeft = '4px solid var(--secondary-green)';
+            } else {
+                alertDiv.style.borderLeft = '4px solid var(--accent-red)';
+            }
+
+            alertDiv.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(alertDiv);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Add animation to cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.classList.add('fade-in');
+        });
+    });
+</script>
+
+<style>
+    .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

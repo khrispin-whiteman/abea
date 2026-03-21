@@ -1,0 +1,274 @@
+<!-- templates/accounts/register.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Register - ABEA" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow border-0" style="border-top: 4px solid var(--accent-red);">
+                <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, var(--accent-red), #f44336);">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>{% trans "Create Your ABEA Account" %}
+                    </h3>
+                    <p class="mb-0 mt-2">{% trans "Join the Africa Biomedical Engineering Alliance" %}</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" id="registrationForm">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">
+                                    <i class="fas fa-user me-2" style="color: var(--primary-green);"></i>{% trans "First Name" %} *
+                                </label>
+                                <input type="text" class="form-control" id="first_name" name="first_name"
+                                       value="{{ form.first_name.value|default:'' }}" required
+                                       style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem 1rem;">
+                                {% if form.first_name.errors %}
+                                <div class="text-danger small">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">
+                                    <i class="fas fa-user me-2" style="color: var(--primary-green);"></i>{% trans "Last Name" %} *
+                                </label>
+                                <input type="text" class="form-control" id="last_name" name="last_name"
+                                       value="{{ form.last_name.value|default:'' }}" required
+                                       style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem 1rem;">
+                                {% if form.last_name.errors %}
+                                <div class="text-danger small">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-2" style="color: var(--primary-green);"></i>{% trans "Email Address" %} *
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   value="{{ form.email.value|default:'' }}" required
+                                   style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem 1rem;">
+                            {% if form.email.errors %}
+                            <div class="text-danger small">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password1" class="form-label">
+                                    <i class="fas fa-lock me-2" style="color: var(--primary-green);"></i>{% trans "Password" %} *
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password1" name="password1" required
+                                           style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem 1rem;">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password1')"
+                                            style="border: 2px solid #e9ecef; border-left: none;">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    {% trans "Minimum 8 characters with letters and numbers." %}
+                                </div>
+                                {% if form.password1.errors %}
+                                <div class="text-danger small">{{ form.password1.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="password2" class="form-label">
+                                    <i class="fas fa-lock me-2" style="color: var(--primary-green);"></i>{% trans "Confirm Password" %} *
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password2" name="password2" required
+                                           style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem 1rem;">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password2')"
+                                            style="border: 2px solid #e9ecef; border-left: none;">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                {% if form.password2.errors %}
+                                <div class="text-danger small">{{ form.password2.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-phone me-2" style="color: var(--primary-green);"></i>{% trans "Phone Number" %} *
+                            </label>
+                            <div class="d-flex gap-2">
+                                <div style="flex: 0 0 180px;">
+                                    {{ form.phone_country_code }}
+                                    {% if form.phone_country_code.errors %}
+                                    <div class="text-danger small">{{ form.phone_country_code.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div style="flex: 1;">
+                                    {{ form.phone_number }}
+                                    {% if form.phone_number.errors %}
+                                    <div class="text-danger small">{{ form.phone_number.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if form.phone.errors %}
+                            <div class="text-danger small">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="country" class="form-label">
+                                <i class="fas fa-globe-africa me-2" style="color: var(--primary-green);"></i>{% trans "Country" %} *
+                            </label>
+                            <select class="form-select" id="country" name="country" required
+                                    style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem 1rem;">
+                                <option value="">{% trans "Select your country" %}</option>
+                            
+                                <option value="Algeria">Algeria</option>
+                                <option value="Angola">Angola</option>
+                                <option value="Benin">Benin</option>
+                                <option value="Botswana">Botswana</option>
+                                <option value="Burkina Faso">Burkina Faso</option>
+                                <option value="Burundi">Burundi</option>
+                                <option value="Cabo Verde">Cabo Verde</option>
+                                <option value="Cameroon">Cameroon</option>
+                                <option value="Central African Republic">Central African Republic</option>
+                                <option value="Chad">Chad</option>
+                                <option value="Comoros">Comoros</option>
+                                <option value="Democratic Republic of the Congo">Democratic Republic of the Congo</option>
+                                <option value="Republic of the Congo">Republic of the Congo</option>
+                                <option value="Côte d’Ivoire">Côte d’Ivoire</option>
+                                <option value="Djibouti">Djibouti</option>
+                                <option value="Egypt">Egypt</option>
+                                <option value="Equatorial Guinea">Equatorial Guinea</option>
+                                <option value="Eritrea">Eritrea</option>
+                                <option value="Eswatini">Eswatini</option>
+                                <option value="Ethiopia">Ethiopia</option>
+                                <option value="Gabon">Gabon</option>
+                                <option value="Gambia">Gambia</option>
+                                <option value="Ghana">Ghana</option>
+                                <option value="Guinea">Guinea</option>
+                                <option value="Guinea-Bissau">Guinea-Bissau</option>
+                                <option value="Kenya">Kenya</option>
+                                <option value="Lesotho">Lesotho</option>
+                                <option value="Liberia">Liberia</option>
+                                <option value="Libya">Libya</option>
+                                <option value="Madagascar">Madagascar</option>
+                                <option value="Malawi">Malawi</option>
+                                <option value="Mali">Mali</option>
+                                <option value="Mauritania">Mauritania</option>
+                                <option value="Mauritius">Mauritius</option>
+                                <option value="Morocco">Morocco</option>
+                                <option value="Mozambique">Mozambique</option>
+                                <option value="Namibia">Namibia</option>
+                                <option value="Niger">Niger</option>
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="Rwanda">Rwanda</option>
+                                <option value="Sao Tome and Principe">Sao Tome and Principe</option>
+                                <option value="Senegal">Senegal</option>
+                                <option value="Seychelles">Seychelles</option>
+                                <option value="Sierra Leone">Sierra Leone</option>
+                                <option value="Somalia">Somalia</option>
+                                <option value="South Africa">South Africa</option>
+                                <option value="South Sudan">South Sudan</option>
+                                <option value="Sudan">Sudan</option>
+                                <option value="Tanzania">Tanzania</option>
+                                <option value="Togo">Togo</option>
+                                <option value="Tunisia">Tunisia</option>
+                                <option value="Uganda">Uganda</option>
+                                <option value="Zambia">Zambia</option>
+                                <option value="Zimbabwe">Zimbabwe</option>
+
+                            </select>
+                            {% if form.country.errors %}
+                            <div class="text-danger small">{{ form.country.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="institution" class="form-label">
+                                <i class="fas fa-university me-2" style="color: var(--primary-green);"></i>{% trans "Institution/Organization" %}
+                            </label>
+                            <input type="text" class="form-control" id="institution" name="institution"
+                                   value="{{ form.institution.value|default:'' }}"
+                                   style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem 1rem;">
+                            {% if form.institution.errors %}
+                            <div class="text-danger small">{{ form.institution.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" required
+                                       style="border: 2px solid var(--primary-green);">
+                                <label class="form-check-label" for="terms">
+                                    {% trans "I agree to the" %}
+                                    <a href="#" class="text-decoration-none" style="color: var(--primary-green);">{% trans "Terms of Service" %}</a>
+                                    {% trans "and" %}
+                                    <a href="#" class="text-decoration-none" style="color: var(--accent-red);">{% trans "Privacy Policy" %}</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-lg"
+                                    style="background: linear-gradient(135deg, var(--accent-red), #f44336); color: white; border: none; padding: 12px 30px; font-weight: 600; border-radius: 30px;">
+                                <i class="fas fa-user-plus me-2"></i>{% trans "Create Account" %}
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-2">{% trans "Already have an accounts?" %}</p>
+                        <a href="{% url 'login' %}" class="btn"
+                           style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); color: white; border: none; padding: 10px 25px; font-weight: 600; border-radius: 30px;">
+                            <i class="fas fa-sign-in-alt me-2"></i>{% trans "Login Here" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+        field.setAttribute('type', type);
+    }
+
+    // Password validation
+    document.getElementById('password1').addEventListener('input', function() {
+        const password = this.value;
+        const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
+
+        if (password.length > 0 && !regex.test(password)) {
+            this.style.borderColor = 'var(--accent-red)';
+        } else {
+            this.style.borderColor = 'var(--primary-green)';
+        }
+    });
+
+    // Confirm password validation
+    document.getElementById('password2').addEventListener('input', function() {
+        const password1 = document.getElementById('password1').value;
+        const password2 = this.value;
+
+        if (password2.length > 0 && password1 !== password2) {
+            this.style.borderColor = 'var(--accent-red)';
+        } else if (password2.length > 0) {
+            this.style.borderColor = 'var(--primary-green)';
+        }
+    });
+
+    // Auto-focus on first name field
+    document.getElementById('first_name').focus();
+</script>
+{% endblock %}

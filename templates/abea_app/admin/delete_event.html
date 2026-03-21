@@ -1,0 +1,253 @@
+<!-- templates/abea_app/admin/delete_event.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete Event" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-center py-4" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); color: white;">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h2 class="mb-0">{% trans "Delete Event" %}</h2>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="alert alert-danger border-0" style="background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(183, 28, 28, 0.1)); border-left: 4px solid var(--accent-red);">
+                            <h5 class="alert-heading mb-2" style="color: var(--accent-red);">
+                                <i class="fas fa-exclamation-circle me-2"></i>{% trans "Warning: This action cannot be undone!" %}
+                            </h5>
+                        </div>
+                    </div>
+
+                    <!-- Event Details -->
+                    <div class="card mb-4" style="border-left: 4px solid var(--primary-green);">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                {% if member.image %}
+                                <img src="{{ member.image.url }}" alt="{{ member.title }}"
+                                     class="rounded me-3" style="width: 80px; height: 60px; object-fit: cover; border: 2px solid var(--primary-green);">
+                                {% else %}
+                                <div class="rounded me-3 d-flex align-items-center justify-content-center"
+                                     style="width: 80px; height: 60px; background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                    <i class="fas fa-calendar-alt fa-2x"></i>
+                                </div>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1" style="color: var(--primary-green);">{{ member.title }}</h5>
+                                    <p class="mb-1 text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        {{ member.start_date|date:"F d, Y" }}
+                                        <i class="fas fa-clock ms-2 me-1"></i>
+                                        {{ member.start_date|time:"g:i A" }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <span class="badge me-2" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                            {{ member.get_event_type_display }}
+                                        </span>
+                                        {% if member.is_published %}
+                                        <span class="badge me-2" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                            {% trans "Published" %}
+                                        </span>
+                                        {% endif %}
+                                        {% if member.is_featured %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); color: white;">
+                                            {% trans "Featured" %}
+                                        </span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Impact Analysis -->
+                    <div class="card mb-4" style="border-left: 4px solid var(--accent-red);">
+                        <div class="card-header" style="background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(183, 28, 28, 0.1));">
+                            <h5 class="mb-0" style="color: var(--accent-red);">
+                                <i class="fas fa-chart-line me-2"></i>{% trans "Impact of Deletion" %}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-users text-danger me-2"></i>{% trans "Registered Participants" %}</span>
+                                    <span class="badge" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); color: white;">
+                                        {{ member.registered_count }}
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-clock text-warning me-2"></i>{% trans "Event Date" %}</span>
+                                    <span>{{ member.start_date|date:"M d, Y" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-calendar text-info me-2"></i>{% trans "Created On" %}</span>
+                                    <span>{{ member.created_at|date:"M d, Y" }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form method="post" class="text-center">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <p class="text-muted">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% trans "To confirm deletion, type the event title below:" %}
+                            </p>
+                            <div class="form-group">
+                                <input type="text" class="form-control form-control-lg text-center"
+                                       id="confirmText"
+                                       placeholder="{% trans 'Type event title here' %}"
+                                       style="border: 2px solid #dc3545; border-radius: 8px; font-weight: 500;">
+                                <div class="form-text">
+                                    {% trans "Must match exactly:" %} <code>{{ member.title }}</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'manage_events' %}" class="btn btn-lg"
+                               style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); border: none; color: white; min-width: 150px;">
+                                <i class="fas fa-arrow-left me-2"></i> {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-lg"
+                                    style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); border: none; color: white; min-width: 150px;"
+                                    id="deleteBtn" disabled>
+                                <i class="fas fa-trash me-2"></i> {% trans "Delete" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 1rem 0;
+        background: transparent;
+    }
+
+    .form-control-lg {
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .form-text {
+        color: var(--accent-red);
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+
+    code {
+        background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(183, 28, 28, 0.1));
+        color: var(--accent-red);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-lg:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .alert {
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmText = document.getElementById('confirmText');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const eventTitle = "{{ member.title }}";
+
+        confirmText.addEventListener('input', function() {
+            if (this.value.trim() === eventTitle) {
+                deleteBtn.disabled = false;
+                deleteBtn.style.opacity = '1';
+            } else {
+                deleteBtn.disabled = true;
+                deleteBtn.style.opacity = '0.6';
+            }
+        });
+
+        // Add shake animation for incorrect input
+        confirmText.addEventListener('blur', function() {
+            if (this.value && this.value.trim() !== eventTitle) {
+                this.classList.add('is-invalid');
+                this.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    this.style.animation = '';
+                }, 500);
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+
+        // Confirm before submitting
+        deleteBtn.addEventListener('click', function(e) {
+            if (!confirm('{% trans "Are you absolutely sure? This cannot be undone!" %}')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+
+<style>
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .is-invalid {
+        border-color: var(--accent-red) !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23d32f2f'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23d32f2f' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+</style>
+{% endblock %}

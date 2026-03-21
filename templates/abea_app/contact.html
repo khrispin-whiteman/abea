@@ -1,0 +1,487 @@
+<!-- templates/abea_app/contact.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title|default:"Contact Us - ABEA" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+    }
+
+    .contact-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1559757175-0eb30cd8c063?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    .contact-info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        height: 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-top: 4px solid transparent;
+    }
+
+    .contact-info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .contact-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .email-icon {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+    }
+
+    .phone-icon {
+        background: linear-gradient(135deg, var(--accent-red), #f44336);
+    }
+
+    .map-icon {
+        background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray));
+    }
+
+    .map-container {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+        position: relative;
+        margin-bottom: 3rem;
+        padding-bottom: 1rem;
+        color: var(--primary-green);
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--accent-red));
+        border-radius: 2px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)) !important;
+        color: white !important;
+    }
+
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Contact Hero -->
+<section class="contact-hero">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-4">{% trans "Get In Touch With ABEA" %}</h1>
+        <p class="lead mb-0">
+            {% trans "We're here to help and answer any questions you might have." %}
+        </p>
+    </div>
+</section>
+
+<!-- Contact Information -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="contact-info-card" style="border-top-color: var(--primary-green);">
+                    <div class="contact-icon email-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h4 style="color: var(--primary-green);">{% trans "Email Us" %}</h4>
+                    <p class="text-muted mb-2">{% trans "For general inquiries" %}</p>
+                    <a href="mailto:{{ contact_email }}" class="text-decoration-none">
+                        <h5 style="color: var(--primary-green);">africabmealliance24@gmail.com</h5>
+                    </a>
+                    <p class="mt-3 small text-muted">
+                        {% trans "We aim to respond within 24-48 hours." %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="contact-info-card" style="border-top-color: var(--accent-red);">
+                    <div class="contact-icon phone-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h4 style="color: var(--accent-red);">{% trans "Call Us" %}</h4>
+                    <p class="text-muted mb-2">{% trans "Executive contacts" %}</p>
+                    <h5 style="color: var(--accent-red);" class="mb-2">+254 723 320894</h5>
+                    <h5 style="color: var(--accent-red);">+260 977 140005</h5>
+                    <p class="mt-3 small text-muted">
+                        {% trans "Available Mon-Fri, 9am-5pm (GMT)" %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="contact-info-card" style="border-top-color: var(--dark-gray);">
+                    <div class="contact-icon map-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4 style="color: var(--dark-gray);">{% trans "Our Network" %}</h4>
+                    <p class="text-muted mb-2">{% trans "Pan-African Presence" %}</p>
+                    <h5 style="color: var(--dark-gray);">{% trans "Africa Biomedical Engineering Alliance" %}</h5>
+                    <p class="mt-3 text-muted">
+                        {% trans "Representing biomedical engineering professionals across all African regions." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header py-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-paper-plane me-2"></i>{% trans "Send Us a Message" %}
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" id="contactForm">
+                            {% csrf_token %}
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_name" class="form-label">{% trans "Your Name" %} *</label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                    <div class="text-danger small">{{ form.name.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_email" class="form-label">{% trans "Email Address" %} *</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_phone" class="form-label">{% trans "Phone Number" %}</label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                    <div class="text-danger small">{{ form.phone.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_organization" class="form-label">{% trans "Organization" %}</label>
+                                    {{ form.organization }}
+                                    {% if form.organization.errors %}
+                                    <div class="text-danger small">{{ form.organization.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_message_type" class="form-label">{% trans "Inquiry Type" %} *</label>
+                                {{ form.message_type }}
+                                {% if form.message_type.errors %}
+                                <div class="text-danger small">{{ form.message_type.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_subject" class="form-label">{% trans "Subject" %} *</label>
+                                {{ form.subject }}
+                                {% if form.subject.errors %}
+                                <div class="text-danger small">{{ form.subject.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="id_message" class="form-label">{% trans "Message" %} *</label>
+                                {{ form.message }}
+                                {% if form.message.errors %}
+                                <div class="text-danger small">{{ form.message.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i>{% trans "Send Message" %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header py-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>{% trans "Contact Information" %}
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="mb-4" style="color: var(--primary-green);">{% trans "Executive Contacts" %}</h5>
+
+                        <div class="mb-4">
+                            <h6 style="color: var(--accent-red);">{% trans "President" %}</h6>
+                            <p class="mb-1">+254 723 320894</p>
+                            <p class="text-muted small">{% trans "General leadership and strategic direction" %}</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6 style="color: var(--accent-red);">{% trans "Secretary" %}</h6>
+                            <p class="mb-1">+260 977 140005</p>
+                            <p class="text-muted small">{% trans "Administrative matters and membership" %}</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6 style="color: var(--accent-red);">{% trans "Vice President" %}</h6>
+                            <p class="mb-1">+243 991 359198</p>
+                            <p class="text-muted small">{% trans "Program development and partnerships" %}</p>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3" style="color: var(--primary-green);">{% trans "Regional Contacts" %}</h5>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <h6 class="small" style="color: var(--accent-red);">{% trans "North Africa" %}</h6>
+                                <p class="small text-muted">contact.north@abea.org</p>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="small" style="color: var(--accent-red);">{% trans "West Africa" %}</h6>
+                                <p class="small text-muted">contact.west@abea.org</p>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="small" style="color: var(--accent-red);">{% trans "East Africa" %}</h6>
+                                <p class="small text-muted">contact.east@abea.org</p>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="small" style="color: var(--accent-red);">{% trans "Southern Africa" %}</h6>
+                                <p class="small text-muted">contact.south@abea.org</p>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="small" style="color: var(--accent-red);">{% trans "Central Africa" %}</h6>
+                                <p class="small text-muted">contact.central@abea.org</p>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="alert" style="background-color: rgba(46, 125, 50, 0.1); border-left: 4px solid var(--primary-green);">
+                            <h6 style="color: var(--primary-green);"><i class="fas fa-clock me-2"></i>{% trans "Response Time" %}</h6>
+                            <p class="mb-0 small">
+                                {% trans "We typically respond to inquiries within 24-48 hours during business days." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title text-center">{% trans "Frequently Asked Questions" %}</h2>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1"
+                                    style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.1)); color: var(--primary-green);">
+                                {% trans "How do I become a member of ABEA?" %}
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {% trans "Visit our Membership page to view available plans and register. You can choose from Full, Affiliate, Associate, or Honorary membership based on your qualifications and needs." %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2"
+                                    style="background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(244, 67, 54, 0.1)); color: var(--accent-red);">
+                                {% trans "What are the benefits of ABEA membership?" %}
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {% trans "Members enjoy networking opportunities, access to exclusive events, professional development resources, policy advocacy representation, and discounts on conferences and training programs." %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3"
+                                    style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.1)); color: var(--primary-green);">
+                                {% trans "How can my organization partner with ABEA?" %}
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {% trans "Please send a partnership inquiry through our contact form or email partnerships@abea.org. Include information about your organization and proposed collaboration areas." %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4"
+                                    style="background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(244, 67, 54, 0.1)); color: var(--accent-red);">
+                                {% trans "Where are ABEA events held?" %}
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {% trans "Events are held across Africa, rotating between different regions. We also offer online events and hybrid formats to ensure accessibility for all members." %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5"
+                                    style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.1)); color: var(--primary-green);">
+                                {% trans "How can I stay updated with ABEA activities?" %}
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {% trans "Subscribe to our newsletter, follow us on social media, and regularly check our News & Events page. Members also receive regular updates via email." %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Contact form submission with AJAX
+        $('#contactForm').submit(function(e) {
+            e.preventDefault();
+
+            const form = $(this);
+            const submitBtn = form.find('button[type="submit"]');
+            const originalText = submitBtn.html();
+
+            // Show loading state
+            submitBtn.prop('disabled', true).html(
+                '<span class="spinner-border spinner-border-sm me-2"></span>{% trans "Sending..." %}'
+            );
+
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: form.serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        // Show success message
+                        $('#contactForm').before(
+                            '<div class="alert alert-success alert-dismissible fade show" role="alert" style="border-left: 4px solid var(--primary-green); background-color: rgba(46, 125, 50, 0.1);">' +
+                            '<i class="fas fa-check-circle me-2" style="color: var(--primary-green);"></i>' + response.message +
+                            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                            '</div>'
+                        );
+
+                        // Reset form
+                        form[0].reset();
+                    } else {
+                        // Show error message
+                        $('#contactForm').before(
+                            '<div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-left: 4px solid var(--accent-red); background-color: rgba(211, 47, 47, 0.1);">' +
+                            '<i class="fas fa-exclamation-circle me-2" style="color: var(--accent-red);"></i>' + response.message +
+                            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                            '</div>'
+                        );
+                    }
+                },
+                error: function() {
+                    // Show generic error
+                    $('#contactForm').before(
+                        '<div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-left: 4px solid var(--accent-red); background-color: rgba(211, 47, 47, 0.1);">' +
+                        '<i class="fas fa-exclamation-circle me-2" style="color: var(--accent-red);"></i>{% trans "An error occurred. Please try again." %}' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>'
+                    );
+                },
+                complete: function() {
+                    // Reset button state
+                    submitBtn.prop('disabled', false).html(originalText);
+
+                    // Scroll to top to show message
+                    $('html, body').animate({
+                        scrollTop: $('#contactForm').offset().top - 100
+                    }, 500);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

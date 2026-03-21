@@ -1,0 +1,85 @@
+<!-- templates/abea_app/partner_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ partner.name }} - {% trans "Partner" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'partners' %}">{% trans "Partners" %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ partner.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    {% if partner.logo %}
+                    <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="img-fluid mb-3" style="max-height: 200px;">
+                    {% else %}
+                    <div class="partner-logo-placeholder d-flex align-items-center justify-content-center mb-3" style="height: 200px; background: linear-gradient(135deg, var(--primary-green), var(--dark-red));">
+                        <i class="fas fa-handshake fa-5x text-white"></i>
+                    </div>
+                    {% endif %}
+
+                    <h4 class="card-title mb-3" style="color: var(--primary-green);">{{ partner.name }}</h4>
+
+                    <div class="mb-3">
+                        <span class="badge" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                            {{ partner.get_partner_type_display }}
+                        </span>
+                        {% if partner.partnership_active %}
+                        <span class="badge ms-1" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                            {% trans "Active Partner" %}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if partner.website %}
+                    <a href="{{ partner.website }}" target="_blank" class="btn w-100 mb-2"
+                       style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                        <i class="fas fa-globe me-2"></i>{% trans "Visit Website" %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3" style="color: var(--primary-green);">{% trans "Partner Information" %}</h5>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Country:" %}</strong> {{ partner.country }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Partnership Type:" %}</strong> {{ partner.get_partner_type_display }}</p>
+                        </div>
+                    </div>
+
+                    {% if partner.description %}
+                    <div class="mb-4">
+                        <h6 style="color: var(--primary-green);">{% trans "Description" %}</h6>
+                        <p>{{ partner.description|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if partner.partnership_details %}
+                    <div class="mb-4">
+                        <h6 style="color: var(--primary-green);">{% trans "Partnership Details" %}</h6>
+                        <p>{{ partner.partnership_details|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

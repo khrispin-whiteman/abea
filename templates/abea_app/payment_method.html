@@ -1,0 +1,1170 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    .payment-method-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        cursor: pointer;
+        height: 100%;
+    }
+
+    .payment-method-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .payment-method-card.selected {
+        border-color: var(--primary-green);
+        background: rgba(46, 125, 50, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .payment-method-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .payment-method-icon.mobile-money {
+        background: linear-gradient(135deg, #FFC107, #FF9800);
+    }
+
+    .payment-method-icon.bank {
+        background: linear-gradient(135deg, #2196F3, #0D47A1);
+    }
+
+    .payment-method-icon.card {
+        background: linear-gradient(135deg, #E91E63, #C2185B);
+    }
+
+    .payment-method-icon.paypal {
+        background: linear-gradient(135deg, #003087, #009CDE);
+    }
+
+    .network-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+
+    .network-badge.mtn {
+        background: linear-gradient(135deg, #FFC107, #FF9800);
+        color: #000;
+    }
+
+    .network-badge.airtel {
+        background: linear-gradient(135deg, #E30613, #B71C1C);
+        color: white;
+    }
+
+    .network-badge.zamtel {
+        background: linear-gradient(135deg, #00A859, #00753A);
+        color: white;
+    }
+
+    .phone-check-status {
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+        display: none;
+    }
+
+    .phone-check-status.success {
+        background: rgba(46, 125, 50, 0.1);
+        border-left: 4px solid var(--primary-green);
+    }
+
+    .phone-check-status.error {
+        background: rgba(211, 47, 47, 0.1);
+        border-left: 4px solid var(--accent-red);
+    }
+
+    .phone-check-status.info {
+        background: rgba(33, 150, 243, 0.1);
+        border-left: 4px solid #2196F3;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top-color: var(--primary-green);
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+    }
+
+    .btn-primary:disabled {
+        background: var(--medium-gray);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+        opacity: 0.7;
+    }
+
+    .btn-outline-primary {
+        border: 2px solid var(--primary-green);
+        color: var(--primary-green);
+        background: transparent;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-green);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .plan-summary {
+        background: linear-gradient(135deg, rgba(46, 125, 50, 0.05), rgba(76, 175, 80, 0.03));
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(46, 125, 50, 0.1);
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+    .form-check-input:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    }
+
+    .alert-info {
+        background: rgba(33, 150, 243, 0.1);
+        border: 1px solid rgba(33, 150, 243, 0.2);
+        color: #0d47a1;
+    }
+
+    .alert-warning {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        color: #ff8f00;
+    }
+
+    .payment-instructions {
+        background: linear-gradient(135deg, rgba(251, 188, 4, 0.05), rgba(255, 193, 7, 0.03));
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+        border-left: 4px solid var(--accent-yellow);
+    }
+
+    .payment-instructions h6 {
+        color: var(--accent-yellow);
+        margin-bottom: 10px;
+    }
+
+    .phone-option-card {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .phone-option-card:hover {
+        border-color: var(--primary-green);
+        background: rgba(46, 125, 50, 0.02);
+    }
+
+    .phone-option-card.selected {
+        border-color: var(--primary-green);
+        background: rgba(46, 125, 50, 0.05);
+    }
+
+    .phone-option-card .form-check-input {
+        margin-top: 0.3rem;
+    }
+
+    @media (max-width: 768px) {
+        .payment-method-card {
+            padding: 1.5rem;
+        }
+
+        .payment-method-icon {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 0.75rem;
+        }
+
+        .payment-method-icon i {
+            font-size: 1.5rem;
+        }
+
+        .network-badges {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Display Django Messages -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Back to Plans -->
+            <div class="mb-4">
+                <a href="{% url 'membership' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>{% trans "Back to Plans" %}
+                </a>
+            </div>
+
+            <!-- Plan Summary -->
+            <div class="plan-summary">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h3 style="color: var(--primary-green);">{{ plan.name }}</h3>
+                        <p class="text-muted mb-2">{{ plan.description }}</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); padding: 6px 15px;">
+                                {{ plan.get_plan_type_display }}
+                            </span>
+                            {% if plan.is_popular %}
+                            <span class="badge" style="background: linear-gradient(135deg, var(--accent-yellow), #ff9800); color: #333; padding: 6px 15px;">
+                                <i class="fas fa-star me-1"></i>{% trans "Popular" %}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <div class="h1" style="color: var(--primary-green); font-weight: 700;">
+                            {{ plan.currency }} {{ plan.price }}
+                        </div>
+                        <p class="text-muted mb-0">
+                            {% blocktranslate count months=plan.duration_months trimmed %}
+                                {{ months }} Month
+                            {% plural %}
+                                {{ months }} Months
+                            {% endblocktranslate %}
+                        </p>
+                        {% if plan.duration_months == 12 %}
+                        <small class="text-success">
+                            <i class="fas fa-calendar-check me-1"></i>{% trans "Annual Membership" %}
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method Selection -->
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                    <h4 class="mb-0">
+                        <i class="fas fa-credit-card me-2"></i>{% trans "Select Payment Method" %}
+                    </h4>
+                    <p class="mb-0 opacity-90 mt-2">
+                        {% trans "Choose how you'd like to pay for your membership" %}
+                    </p>
+                </div>
+                <div class="card-body">
+                    <form id="paymentForm" method="POST" action="{% url 'initiate_payment' plan.id %}">
+                        {% csrf_token %}
+
+                        <!-- Payment Methods -->
+                        <div class="row g-4 mb-4">
+                            <!-- Mobile Money -->
+                            <div class="col-md-6">
+                                <div class="payment-method-card" data-method="MOBILE_MONEY">
+                                    <div class="text-center">
+                                        <div class="payment-method-icon mobile-money mx-auto">
+                                            <i class="fas fa-mobile-alt fa-2x text-white"></i>
+                                        </div>
+                                        <h5>{% trans "Mobile Money" %} <small>{% trans "(Zambia Only)" %}</small></h5>
+                                        <p class="text-muted small">{% trans "Pay with MTN, Airtel, or Zamtel" %}</p>
+
+                                        <div class="network-badges mb-3">
+                                            <span class="network-badge mtn">MTN</span>
+                                            <span class="network-badge airtel">AIRTEL</span>
+                                            <span class="network-badge zamtel">ZAMTEL</span>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="payment_method"
+                                                   id="mobile_money" value="MOBILE_MONEY" required>
+                                            <label class="form-check-label" for="mobile_money">
+                                                {% trans "Select Mobile Money" %}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Credit Card -->
+                            <div class="col-md-6">
+                                <div class="payment-method-card" data-method="CREDIT_CARD">
+                                    <div class="text-center">
+                                        <div class="payment-method-icon card mx-auto">
+                                            <i class="fas fa-credit-card fa-2x text-white"></i>
+                                        </div>
+                                        <h5>{% trans "Credit Card" %}</h5>
+                                        <p class="text-muted small">{% trans "Visa, Mastercard, Amex" %}</p>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="payment_method"
+                                                   id="credit_card" value="CREDIT_CARD" required>
+                                            <label class="form-check-label" for="credit_card">
+                                                {% trans "Select Credit Card" %}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bank Transfer -->
+{#                            <div class="col-md-6">#}
+{#                                <div class="payment-method-card" data-method="BANK_TRANSFER">#}
+{#                                    <div class="text-center">#}
+{#                                        <div class="payment-method-icon bank mx-auto">#}
+{#                                            <i class="fas fa-university fa-2x text-white"></i>#}
+{#                                        </div>#}
+{#                                        <h5>{% trans "Bank Transfer" %}</h5>#}
+{#                                        <p class="text-muted small">{% trans "Direct bank transfer" %}</p>#}
+{#                                        <div class="form-check">#}
+{#                                            <input class="form-check-input" type="radio" name="payment_method"#}
+{#                                                   id="bank_transfer" value="BANK_TRANSFER" required>#}
+{#                                            <label class="form-check-label" for="bank_transfer">#}
+{#                                                {% trans "Select Bank Transfer" %}#}
+{#                                            </label>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{##}
+{#                            #}
+{#                            <!-- PayPal -->#}
+{#                            <div class="col-md-6">#}
+{#                                <div class="payment-method-card" data-method="PAYPAL">#}
+{#                                    <div class="text-center">#}
+{#                                        <div class="payment-method-icon paypal mx-auto">#}
+{#                                            <i class="fab fa-paypal fa-2x text-white"></i>#}
+{#                                        </div>#}
+{#                                        <h5>{% trans "PayPal" %}</h5>#}
+{#                                        <p class="text-muted small">{% trans "Secure PayPal payment" %}</p>#}
+{#                                        <div class="form-check">#}
+{#                                            <input class="form-check-input" type="radio" name="payment_method"#}
+{#                                                   id="paypal" value="PAYPAL" required>#}
+{#                                            <label class="form-check-label" for="paypal">#}
+{#                                                {% trans "Select PayPal" %}#}
+{#                                            </label>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+                        </div>
+
+                        <!-- Mobile Money Details (Shown only when selected) -->
+                        <div id="mobileMoneyDetails" class="mt-4" style="display: none;">
+                            <h5 class="mb-3" style="color: var(--primary-green);">
+                                <i class="fas fa-mobile-alt me-2"></i>{% trans "Mobile Money Details" %}
+                            </h5>
+
+                            <!-- Phone Number Selection -->
+                            <div class="mb-4">
+                                <label class="form-label">{% trans "Select Phone Number to Use" %}</label>
+
+{#                                <!-- Default Account Phone -->#}
+{#                                <div class="phone-option-card" id="defaultPhoneOption">#}
+{#                                    <div class="form-check">#}
+{#                                        <input class="form-check-input" type="radio" name="phone_choice"#}
+{#                                               id="use_default_phone" value="default" checked>#}
+{#                                        <label class="form-check-label w-100" for="use_default_phone">#}
+{#                                            <div class="d-flex justify-content-between align-items-center">#}
+{#                                                <div>#}
+{#                                                    <strong>{% trans "Use account phone number" %}</strong>#}
+{#                                                    <div class="text-muted">#}
+{#                                                        {{ user_phone|default:"No phone number on account" }}#}
+{#                                                        {% if default_network %}#}
+{#                                                        <span class="badge ms-2" style="background:#}
+{#                                                            {% if default_network == 'MTN' %}linear-gradient(135deg, #FFC107, #FF9800)#}
+{#                                                            {% elif default_network == 'AIRTEL' %}linear-gradient(135deg, #E30613, #B71C1C)#}
+{#                                                            {% else %}linear-gradient(135deg, #00A859, #00753A){% endif %};#}
+{#                                                            color: {% if default_network == 'MTN' %}#000{% else %}white{% endif %};">#}
+{#                                                            {{ default_network }}#}
+{#                                                        </span>#}
+{#                                                        {% endif %}#}
+{#                                                    </div>#}
+{#                                                </div>#}
+{#                                                <div>#}
+{#                                                    <span class="badge bg-primary">{% trans "Default" %}</span>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </label>#}
+{#                                    </div>#}
+{#                                </div>#}
+
+                                <!-- Default Account Phone -->
+                                <div class="phone-option-card" id="defaultPhoneOption">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="phone_choice"
+                                               id="use_default_phone" value="default" checked>
+                                        <label class="form-check-label w-100" for="use_default_phone">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>{% trans "Use account phone number" %}</strong>
+                                                    <div class="text-muted">
+                                                        {{ user_phone|default:"No phone number on account" }}
+                                                        {% if default_network %}
+                                                        <span class="badge ms-2" style="background:
+                                                            {% if default_network == 'MTN' %}linear-gradient(135deg, #FFC107, #FF9800)
+                                                            {% elif default_network == 'AIRTEL' %}linear-gradient(135deg, #E30613, #B71C1C)
+                                                            {% elif default_network == 'ZAMTEL' %}linear-gradient(135deg, #00A859, #00753A){% endif %};
+                                                            color: {% if default_network == 'MTN' %}#000{% else %}white{% endif %};">
+                                                            {{ default_network }}
+                                                        </span>
+                                                        {% endif %}
+                                                    </div>
+                                                    {% if account_name %}
+                                                    <div class="small text-success mt-1">
+                                                        <i class="fas fa-check-circle me-1"></i>{{ account_name }}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-primary">{% trans "Default" %}</span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Phone -->
+                                <div class="phone-option-card" id="customPhoneOption">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="phone_choice"
+                                               id="use_custom_phone" value="custom">
+                                        <label class="form-check-label w-100" for="use_custom_phone">
+                                            <strong>{% trans "Use a different phone number" %}</strong>
+                                            <div class="text-muted">{% trans "Enter a phone number for this payment only" %}</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Custom Phone Number Input (Hidden by default) -->
+                            <div id="customPhoneSection" style="display: none;">
+                                <div class="row g-3">
+                                    <!-- Phone Number -->
+                                    <div class="col-md-6">
+                                        <label for="mobile_number" class="form-label">
+                                            {% trans "Phone Number" %} <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-phone"></i>
+                                            </span>
+                                            <input type="tel" class="form-control" id="mobile_number"
+                                                   name="mobile_number" placeholder="0971234567"
+                                                   pattern="[0-9]{10}" maxlength="10"
+                                                   oninput="formatPhoneNumber(this)">
+                                            <button class="btn btn-outline-primary" type="button" id="checkPhoneBtn">
+                                                <i class="fas fa-search"></i> {% trans "Verify" %}
+                                            </button>
+                                        </div>
+                                        <div id="phoneCheckResult" class="phone-check-status mt-2"></div>
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            {% trans "Enter 10 digits starting with 0 (e.g., 0971234567)" %}
+                                        </small>
+                                    </div>
+
+                                    <!-- Network (auto-detected or manual) -->
+                                    <div class="col-md-6">
+                                        <label for="mobile_network" class="form-label">
+                                            {% trans "Mobile Network" %} <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="mobile_network" name="mobile_network">
+                                            <option value="">{% trans "Select Network" %}</option>
+                                            <option value="MTN">MTN</option>
+                                            <option value="AIRTEL">Airtel</option>
+                                            <option value="ZAMTEL">Zamtel</option>
+                                        </select>
+                                        <small class="text-muted">
+                                            <i class="fas fa-bolt me-1"></i>
+                                            {% trans "Click 'Verify' to auto-detect your network" %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hidden fields for default phone -->
+                            <input type="hidden" id="default_mobile_number" name="mobile_number" value="{{ normalized_phone|default:user_phone }}">
+                            <input type="hidden" id="default_mobile_network" name="mobile_network" value="{{ default_network }}">
+
+                            <!-- Mobile Money Instructions -->
+                            <div class="payment-instructions">
+                                <h6>
+                                    <i class="fas fa-play-circle me-2"></i>
+                                    {% trans "How Mobile Money Payment Works" %}
+                                </h6>
+                                <ol class="mb-0" style="padding-left: 20px;">
+                                    <li>{% trans "Enter your mobile money phone number" %}</li>
+                                    <li>{% trans "We'll send a payment request to your phone" %}</li>
+                                    <li>{% trans "Check your phone for a payment notification" %}</li>
+                                    <li>{% trans "Approve the payment in your mobile money app" %}</li>
+                                    <li>{% trans "Your membership will be activated immediately" %}</li>
+                                </ol>
+                            </div>
+
+                            <!-- Network Instructions -->
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <div class="alert alert-info">
+                                        <h6 class="alert-heading">
+                                            <i class="fas fa-sim-card me-2"></i>MTN
+                                        </h6>
+                                        <small>
+                                            {% trans "Dial *170# and select 'Pay Bill' or use MoMo App" %}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="alert alert-info">
+                                        <h6 class="alert-heading">
+                                            <i class="fas fa-sim-card me-2"></i>Airtel
+                                        </h6>
+                                        <small>
+                                            {% trans "Dial *170# and select 'Airtel Money'" %}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="alert alert-info">
+                                        <h6 class="alert-heading">
+                                            <i class="fas fa-sim-card me-2"></i>Zamtel
+                                        </h6>
+                                        <small>
+                                            {% trans "Dial *170# and select 'Zampay'" %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bank Transfer Details -->
+                        <div id="bankTransferDetails" class="mt-4" style="display: none;">
+                            <h5 class="mb-3" style="color: var(--primary-green);">
+                                <i class="fas fa-university me-2"></i>{% trans "Bank Transfer Instructions" %}
+                            </h5>
+
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <strong>{% trans "Important:" %}</strong>
+                                {% trans "After making the bank transfer, please email the proof of payment to payments@abea.org. Your membership will be activated once we verify your payment." %}
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                        <tr>
+                                            <th colspan="2">
+                                                <i class="fas fa-bank me-2"></i>{% trans "Bank Account Details" %}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th width="30%">{% trans "Bank Name" %}</th>
+                                            <td><strong>Standard Chartered Bank</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <th>{% trans "Account Name" %}</th>
+                                            <td><strong>Africa Biomedical Engineering Alliance</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <th>{% trans "Account Number" %}</th>
+                                            <td><strong class="font-monospace">010 1234 5678 90</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <th>{% trans "SWIFT Code" %}</th>
+                                            <td><strong class="font-monospace">SCBLKENA</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <th>{% trans "Branch" %}</th>
+                                            <td>Nairobi West</td>
+                                        </tr>
+                                        <tr>
+                                            <th>{% trans "Currency" %}</th>
+                                            <td>{{ plan.currency }} ({% trans "US Dollars" %})</td>
+                                        </tr>
+                                        <tr>
+                                            <th>{% trans "Amount" %}</th>
+                                            <td>
+                                                <strong style="color: var(--primary-green);">
+                                                    {{ plan.currency }} {{ plan.price }}
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>{% trans "Reference" %}</th>
+                                            <td>
+                                                <code style="background: rgba(46, 125, 50, 0.1); padding: 5px 10px; border-radius: 4px;">
+                                                    ABEA-{{ plan.id }}-{{ request.user.id }}
+                                                </code>
+                                                <small class="text-muted d-block mt-1">
+                                                    {% trans "Please include this reference in your transfer" %}
+                                                </small>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="payment-instructions">
+                                <h6>
+                                    <i class="fas fa-clock me-2"></i>
+                                    {% trans "Processing Time" %}
+                                </h6>
+                                <p class="mb-2">
+                                    {% trans "Bank transfers typically take 1-3 business days to process. You'll receive an email confirmation once your payment is verified and your membership is activated." %}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Online Payment Details -->
+                        <div id="onlinePaymentDetails" class="mt-4" style="display: none;">
+                            <div class="text-center py-4">
+                                <div class="loading-spinner mx-auto mb-3" style="width: 40px; height: 40px;"></div>
+                                <p class="text-muted">
+                                    {% trans "You will be redirected to a secure payment page..." %}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between mt-4 pt-4 border-top">
+                            <a href="{% url 'membership' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>{% trans "Back to Plans" %}
+                            </a>
+                            <button type="submit" id="submitPaymentBtn" class="btn btn-primary">
+                                <i class="fas fa-lock me-2"></i>{% trans "Proceed to Payment" %}
+                            </button>
+                        </div>
+
+                        <!-- Security Notice -->
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                {% trans "Secure payment processing • 256-bit SSL encryption • Your data is protected" %}
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Support Information -->
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h5 style="color: var(--primary-green);">
+                        <i class="fas fa-headset me-2"></i>{% trans "Need Help?" %}
+                    </h5>
+                    <p class="text-muted mb-3">
+                        {% trans "Our support team is here to help you with the payment process." %}
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="mailto:support@abea.org" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-envelope me-2"></i>support@abea.org
+                        </a>
+                        <a href="tel:+260123456789" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-phone me-2"></i>+260 123 456 789
+                        </a>
+                        <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-comments me-2"></i>{% trans "Contact Form" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentForm = document.getElementById('paymentForm');
+    const submitBtn = document.getElementById('submitPaymentBtn');
+    const mobileMoneyDetails = document.getElementById('mobileMoneyDetails');
+    const bankTransferDetails = document.getElementById('bankTransferDetails');
+    const onlinePaymentDetails = document.getElementById('onlinePaymentDetails');
+    const checkPhoneBtn = document.getElementById('checkPhoneBtn');
+    const phoneCheckResult = document.getElementById('phoneCheckResult');
+    const mobileNumberInput = document.getElementById('mobile_number');
+    const mobileNetworkSelect = document.getElementById('mobile_network');
+    const defaultPhoneOption = document.getElementById('defaultPhoneOption');
+    const customPhoneOption = document.getElementById('customPhoneOption');
+    const customPhoneSection = document.getElementById('customPhoneSection');
+    const defaultMobileNumberInput = document.getElementById('default_mobile_number');
+    const defaultMobileNetworkInput = document.getElementById('default_mobile_network');
+
+    // State variables
+    let selectedPaymentMethod = null;
+    let isUsingCustomPhone = false;
+
+    // ---------- New robust phone validation ----------
+    function isValidZambianPhone(phone) {
+        // Remove all non‑digit characters
+        const digits = phone.replace(/\D/g, '');
+
+        // Case 1: exactly 10 digits starting with 0 (local format)
+        if (digits.length === 10 && digits.startsWith('0')) {
+            return true;
+        }
+
+        // Case 2: 12 digits starting with 260 (international format)
+        // After removing the country code, we must have 9 remaining digits,
+        // which become a valid 10‑digit number when we add a leading zero.
+        if (digits.length === 12 && digits.startsWith('260')) {
+            const rest = digits.slice(3);           // e.g. "769566586"
+            return rest.length === 9;                // 9 digits → after adding '0' it becomes 10 digits starting with 0
+        }
+
+        // Case 3: already 9 digits? (rare, but if the user entered "769566586")
+        // In practice, the input formatting prevents this, but we handle it defensively.
+        if (digits.length === 9 && !digits.startsWith('0')) {
+            return true;    // adding a leading zero would make it valid
+        }
+
+        return false;
+    }
+
+    // Initialize button state
+    updateSubmitButtonState();
+
+    // Phone choice selection
+    document.querySelectorAll('input[name="phone_choice"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                isUsingCustomPhone = true;
+                customPhoneSection.style.display = 'block';
+                defaultPhoneOption.classList.remove('selected');
+                customPhoneOption.classList.add('selected');
+
+                // Enable custom phone fields, disable hidden fields
+                mobileNumberInput.disabled = false;
+                mobileNetworkSelect.disabled = false;
+                defaultMobileNumberInput.disabled = true;
+                defaultMobileNetworkInput.disabled = true;
+
+                // Make custom fields required
+                mobileNumberInput.required = true;
+                mobileNetworkSelect.required = true;
+
+                // Clear any previous phone check results
+                phoneCheckResult.style.display = 'none';
+            } else {
+                isUsingCustomPhone = false;
+                customPhoneSection.style.display = 'none';
+                defaultPhoneOption.classList.add('selected');
+                customPhoneOption.classList.remove('selected');
+
+                // Enable hidden fields, disable custom fields
+                mobileNumberInput.disabled = true;
+                mobileNetworkSelect.disabled = true;
+                defaultMobileNumberInput.disabled = false;
+                defaultMobileNetworkInput.disabled = false;
+
+                // Remove required from custom fields
+                mobileNumberInput.required = false;
+                mobileNetworkSelect.required = false;
+
+                // Set default values from hidden inputs (for display only, but they are disabled)
+                mobileNumberInput.value = defaultMobileNumberInput.value || '';
+                mobileNetworkSelect.value = defaultMobileNetworkInput.value || '';
+            }
+            validateMobileMoneyFields();
+        });
+    });
+
+    // Payment method selection
+    document.querySelectorAll('.payment-method-card').forEach(card => {
+        card.addEventListener('click', function() {
+            selectPaymentMethod(this);
+        });
+
+        const radio = card.querySelector('input[type="radio"]');
+        radio.addEventListener('click', function(e) {
+            e.stopPropagation();
+            selectPaymentMethod(card);
+        });
+    });
+
+    document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const card = this.closest('.payment-method-card');
+            if (card) {
+                selectPaymentMethod(card);
+            }
+        });
+    });
+
+    function selectPaymentMethod(card) {
+        const radio = card.querySelector('input[type="radio"]');
+        radio.checked = true;
+        selectedPaymentMethod = card.dataset.method;
+
+        document.querySelectorAll('.payment-method-card').forEach(c => {
+            c.classList.remove('selected');
+        });
+        card.classList.add('selected');
+
+        mobileMoneyDetails.style.display = 'none';
+        bankTransferDetails.style.display = 'none';
+        onlinePaymentDetails.style.display = 'none';
+
+        if (selectedPaymentMethod === 'MOBILE_MONEY') {
+            mobileMoneyDetails.style.display = 'block';
+            validateMobileMoneyFields();
+        } else if (selectedPaymentMethod === 'BANK_TRANSFER') {
+            bankTransferDetails.style.display = 'block';
+        } else if (selectedPaymentMethod === 'CREDIT_CARD' || selectedPaymentMethod === 'PAYPAL') {
+            onlinePaymentDetails.style.display = 'block';
+        }
+
+        updateSubmitButtonState();
+    }
+
+    function formatPhoneNumber(input) {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length > 0 && !value.startsWith('0')) {
+            value = '0' + value;
+        }
+        if (value.length > 10) {
+            value = value.substring(0, 10);
+        }
+        input.value = value;
+    }
+
+    checkPhoneBtn.addEventListener('click', function() {
+        const phoneNumber = mobileNumberInput.value.trim();
+
+        if (!phoneNumber) {
+            showPhoneCheckResult('error', '{% trans "Please enter a phone number" %}');
+            return;
+        }
+
+        if (!isValidZambianPhone(phoneNumber)) {
+            showPhoneCheckResult('error', '{% trans "Please enter a valid 10-digit Zambian mobile number starting with 0 (e.g., 0971234567)" %}');
+            return;
+        }
+
+        const originalHtml = checkPhoneBtn.innerHTML;
+        checkPhoneBtn.disabled = true;
+        checkPhoneBtn.innerHTML = '<div class="loading-spinner"></div> {% trans "Checking..." %}';
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch('{% url "lookup_network" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrftoken
+            },
+            body: new URLSearchParams({
+                'phone': phoneNumber
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mobileNetworkSelect.value = data.network;
+                let message = `{% trans "Network detected:" %} ${data.network}`;
+                if (data.account_name) {
+                    message += ` - ${data.account_name}`;
+                }
+                message += ` - {% trans "Please proceed with payment" %}`;
+                showPhoneCheckResult('success', message);
+            } else {
+                showPhoneCheckResult('error', data.error || '{% trans "Could not detect network" %}');
+            }
+            checkPhoneBtn.disabled = false;
+            checkPhoneBtn.innerHTML = originalHtml;
+            validateMobileMoneyFields();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showPhoneCheckResult('error', '{% trans "Network error. Please try again." %}');
+            checkPhoneBtn.disabled = false;
+            checkPhoneBtn.innerHTML = originalHtml;
+        });
+    });
+
+    function validateMobileMoneyFields() {
+        if (!selectedPaymentMethod || selectedPaymentMethod !== 'MOBILE_MONEY') {
+            return;
+        }
+
+        if (isUsingCustomPhone) {
+            const phoneNumber = mobileNumberInput.value.trim();
+            const network = mobileNetworkSelect.value;
+
+            if (phoneNumber && network && isValidZambianPhone(phoneNumber)) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('btn-secondary');
+                submitBtn.classList.add('btn-primary');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-secondary');
+            }
+        } else {
+            const defaultPhone = defaultMobileNumberInput.value || '';
+            const defaultNetwork = defaultMobileNetworkInput.value || '';
+
+            if (defaultPhone && defaultNetwork && isValidZambianPhone(defaultPhone)) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('btn-secondary');
+                submitBtn.classList.add('btn-primary');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-secondary');
+
+                if (!defaultPhone) {
+                    phoneCheckResult.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span>{% trans "No phone number on your account. Please use custom phone option." %}</span>
+                        </div>
+                    `;
+                    phoneCheckResult.className = 'phone-check-status error';
+                    phoneCheckResult.style.display = 'block';
+                }
+            }
+        }
+    }
+
+    function updateSubmitButtonState() {
+        if (!selectedPaymentMethod) {
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('btn-primary');
+            submitBtn.classList.add('btn-secondary');
+            return;
+        }
+
+        if (selectedPaymentMethod === 'MOBILE_MONEY') {
+            validateMobileMoneyFields();
+        } else {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-secondary');
+            submitBtn.classList.add('btn-primary');
+        }
+    }
+
+    mobileNumberInput.addEventListener('input', function() {
+        formatPhoneNumber(this);
+        validateMobileMoneyFields();
+        phoneCheckResult.style.display = 'none';
+    });
+
+    mobileNetworkSelect.addEventListener('change', function() {
+        validateMobileMoneyFields();
+        phoneCheckResult.style.display = 'none';
+    });
+
+    function showPhoneCheckResult(type, message) {
+        phoneCheckResult.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas fa-${type === 'success' ? 'check-circle' :
+                                  type === 'error' ? 'exclamation-circle' :
+                                  'info-circle'} me-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        phoneCheckResult.className = `phone-check-status ${type}`;
+        phoneCheckResult.style.display = 'block';
+    }
+
+    paymentForm.addEventListener('submit', function(e) {
+        const selectedMethod = document.querySelector('input[name="payment_method"]:checked');
+
+        if (!selectedMethod) {
+            e.preventDefault();
+            alert('{% trans "Please select a payment method" %}');
+            return;
+        }
+
+        if (selectedMethod.value === 'MOBILE_MONEY') {
+            if (isUsingCustomPhone) {
+                const phoneNumber = mobileNumberInput.value.trim();
+                const network = mobileNetworkSelect.value;
+
+                if (!phoneNumber) {
+                    e.preventDefault();
+                    alert('{% trans "Please enter your mobile number" %}');
+                    mobileNumberInput.focus();
+                    return;
+                }
+
+                if (!isValidZambianPhone(phoneNumber)) {
+                    e.preventDefault();
+                    alert('{% trans "Please enter a valid 10-digit Zambian mobile number starting with 0 (e.g., 0971234567)" %}');
+                    mobileNumberInput.focus();
+                    return;
+                }
+
+                if (!network) {
+                    e.preventDefault();
+                    alert('{% trans "Please select your mobile network" %}');
+                    mobileNetworkSelect.focus();
+                    return;
+                }
+            } else {
+                const defaultPhone = defaultMobileNumberInput.value || '';
+                const defaultNetwork = defaultMobileNetworkInput.value || '';
+
+                if (!defaultPhone) {
+                    e.preventDefault();
+                    alert('{% trans "No phone number on your account. Please use custom phone option." %}');
+                    document.getElementById('use_custom_phone').checked = true;
+                    document.getElementById('use_custom_phone').dispatchEvent(new Event('change'));
+                    return;
+                }
+
+                if (!defaultNetwork) {
+                    e.preventDefault();
+                    alert('{% trans "No default network detected for your phone number. Please use custom phone option." %}');
+                    document.getElementById('use_custom_phone').checked = true;
+                    document.getElementById('use_custom_phone').dispatchEvent(new Event('change'));
+                    return;
+                }
+
+                // Also validate that the default phone is a valid Zambian number after normalization
+                if (!isValidZambianPhone(defaultPhone)) {
+                    e.preventDefault();
+                    alert('{% trans "The phone number on your account is not a valid Zambian mobile number. Please use custom phone option." %}');
+                    document.getElementById('use_custom_phone').checked = true;
+                    document.getElementById('use_custom_phone').dispatchEvent(new Event('change'));
+                    return;
+                }
+            }
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading-spinner" style="border-top-color: white; margin-right: 8px; display: inline-block;"></div> {% trans "Processing..." %}';
+    });
+
+    function initializePaymentMethod() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const presetMethod = urlParams.get('method');
+
+        if (presetMethod) {
+            const radio = document.querySelector(`input[name="payment_method"][value="${presetMethod.toUpperCase()}"]`);
+            if (radio) {
+                radio.checked = true;
+                radio.dispatchEvent(new Event('change'));
+            }
+        }
+
+        const checkedRadio = document.querySelector('input[name="payment_method"]:checked');
+        if (checkedRadio) {
+            const card = checkedRadio.closest('.payment-method-card');
+            if (card) {
+                selectPaymentMethod(card);
+            }
+        }
+
+        const defaultPhone = defaultMobileNumberInput.value || '';
+        const defaultNetwork = defaultMobileNetworkInput.value || '';
+
+        if (defaultPhone && defaultNetwork) {
+            document.getElementById('use_default_phone').checked = true;
+            document.getElementById('use_default_phone').dispatchEvent(new Event('change'));
+            // Optionally show a success message (but only if the phone passes validation)
+            if (isValidZambianPhone(defaultPhone)) {
+                showPhoneCheckResult('success',
+                    `{% trans "Default phone verified:" %} ${defaultNetwork} - {% trans "Ready for payment" %}`
+                );
+            } else {
+                // Phone exists but is not in a valid format – force custom
+                document.getElementById('use_custom_phone').checked = true;
+                document.getElementById('use_custom_phone').dispatchEvent(new Event('change'));
+                mobileNumberInput.value = defaultPhone; // pre‑fill for convenience
+                showPhoneCheckResult('info',
+                    '{% trans "Please correct the phone number and click Verify" %}'
+                );
+            }
+        } else if (defaultPhone && !defaultNetwork) {
+            document.getElementById('use_custom_phone').checked = true;
+            document.getElementById('use_custom_phone').dispatchEvent(new Event('change'));
+            mobileNumberInput.value = defaultPhone;
+            showPhoneCheckResult('info',
+                '{% trans "Please click Verify to detect your network" %}'
+            );
+        } else {
+            document.getElementById('use_custom_phone').checked = true;
+            document.getElementById('use_custom_phone').dispatchEvent(new Event('change'));
+        }
+
+        updateSubmitButtonState();
+    }
+
+    initializePaymentMethod();
+});
+</script>
+{% endblock %}

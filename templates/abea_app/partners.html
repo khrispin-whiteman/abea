@@ -1,0 +1,422 @@
+<!-- templates/abea_app/partners.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title|default:"Our Partners - ABEA" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+    }
+
+    .partners-hero {
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-gray) 100%);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    .partners-section {
+        padding: 5rem 0;
+    }
+
+    .partner-type-section {
+        margin-bottom: 4rem;
+    }
+
+    .partner-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        height: 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-top: 4px solid transparent;
+    }
+
+    .partner-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .partner-logo-container {
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        padding: 20px;
+        background-color: var(--light-gray);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .partner-card:hover .partner-logo-container {
+        background-color: #e8f5e9;
+        box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
+    }
+
+    .partner-logo {
+        max-width: 100%;
+        max-height: 80px;
+        object-fit: contain;
+        filter: grayscale(100%);
+        opacity: 0.8;
+        transition: all 0.3s ease;
+    }
+
+    .partner-card:hover .partner-logo {
+        filter: grayscale(0%);
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    .partner-name {
+        color: var(--dark-gray);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+    }
+
+    .partner-card:hover .partner-name {
+        color: var(--primary-green);
+    }
+
+    .partner-country {
+        color: var(--accent-red);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .partner-description {
+        color: var(--medium-gray);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .partner-link {
+        color: var(--primary-green);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        transition: color 0.3s ease;
+    }
+
+    .partner-link:hover {
+        color: var(--accent-red);
+    }
+
+    .section-title {
+        position: relative;
+        margin-bottom: 3rem;
+        padding-bottom: 1rem;
+        color: var(--primary-green);
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--accent-red));
+        border-radius: 2px;
+    }
+
+    .type-title {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-bottom: 0.5rem;
+        color: var(--accent-red);
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .type-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background-color: var(--accent-red);
+        border-radius: 2px;
+    }
+
+    .become-partner-section {
+        background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(66, 66, 66, 0.1));
+        border-radius: 15px;
+        padding: 4rem;
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .type-title {
+            font-size: 1.5rem;
+        }
+
+        .become-partner-section {
+            padding: 2rem;
+        }
+
+        .partner-logo-container {
+            height: 100px;
+        }
+
+        .partner-logo {
+            max-height: 60px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .partner-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Partners Hero -->
+<section class="partners-hero">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-4">{% trans "Our Valued Partners" %}</h1>
+        <p class="lead mb-0">
+            {% trans "Collaborating with leading organizations across Africa and beyond to advance biomedical engineering." %}
+        </p>
+    </div>
+</section>
+
+<!-- Partners by Type -->
+<section class="partners-section">
+    <div class="container">
+        <h2 class="section-title text-center">{% trans "Strategic Partnerships" %}</h2>
+
+        {% if partners_by_type %}
+            {% for partner_type, partners in partners_by_type.items %}
+            <div class="partner-type-section">
+                <h3 class="type-title">{{ partner_type }}</h3>
+
+                <div class="row g-4">
+                    {% for partner in partners %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="partner-card" style="border-top-color: var(--accent-red);">
+                            <div class="partner-logo-container">
+                                {% if partner.logo %}
+                                <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="partner-logo">
+                                {% else %}
+                                <div class="partner-logo-placeholder">
+                                    <i class="fas fa-handshake fa-3x" style="color: var(--primary-green);"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <h4 class="partner-name">{{ partner.name }}</h4>
+
+                            {% if partner.country %}
+                            <div class="partner-country">
+                                <i class="fas fa-map-marker-alt me-1"></i> {{ partner.country }}
+                            </div>
+                            {% endif %}
+
+                            {% if partner.description %}
+                            <p class="partner-description">
+                                {{ partner.description|truncatewords:20 }}
+                            </p>
+                            {% endif %}
+
+                            <div class="mt-3">
+                                <a href="{{ partner.website }}" target="_blank" rel="noopener noreferrer" class="partner-link">
+                                    {% trans "Visit Website" %} <i class="fas fa-external-link-alt ms-2"></i>
+                                </a>
+                            </div>
+
+                            {% if partner.partnership_date %}
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    {% trans "Partner since" %} {{ partner.partnership_date|date:"Y" }}
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="text-center py-5">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                 style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                <i class="fas fa-handshake fa-3x text-white"></i>
+            </div>
+            <h4>{% trans "No partners available yet" %}</h4>
+            <p class="text-muted">{% trans "Check back soon for our partner organizations!" %}</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Become a Partner Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="become-partner-section">
+            <h2 class="mb-4" style="color: var(--primary-green);">{% trans "Become a Partner" %}</h2>
+
+            <p class="lead mb-4">
+                {% trans "Join our network of partners and help advance biomedical engineering across Africa." %}
+            </p>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="text-center p-3">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                             style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                            <i class="fas fa-network-wired fa-2x text-white"></i>
+                        </div>
+                        <h5 style="color: var(--primary-green);">{% trans "Network Access" %}</h5>
+                        <p class="small text-muted">
+                            {% trans "Connect with biomedical engineering professionals across Africa." %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="text-center p-3">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                             style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--accent-red), #f44336);">
+                            <i class="fas fa-bullhorn fa-2x text-white"></i>
+                        </div>
+                        <h5 style="color: var(--accent-red);">{% trans "Brand Visibility" %}</h5>
+                        <p class="small text-muted">
+                            {% trans "Showcase your organization to our growing community." %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="text-center p-3">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                             style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray));">
+                            <i class="fas fa-handshake fa-2x text-white"></i>
+                        </div>
+                        <h5 style="color: var(--dark-gray);">{% trans "Collaboration" %}</h5>
+                        <p class="small text-muted">
+                            {% trans "Work together on projects and initiatives." %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'contact' %}" class="btn btn-lg"
+                   style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); color: white;">
+                    <i class="fas fa-envelope me-2"></i>{% trans "Contact Us" %}
+                </a>
+                <a href="#" class="btn btn-lg btn-outline-secondary">
+                    <i class="fas fa-file-download me-2"></i>{% trans "Partnership Brochure" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Partnership Types -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center">{% trans "Partnership Opportunities" %}</h2>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100" style="border-top: 4px solid var(--primary-green);">
+                    <div class="card-body p-4">
+                        <h4 class="mb-3" style="color: var(--primary-green);">
+                            <i class="fas fa-building me-2"></i>{% trans "Corporate Partnership" %}
+                        </h4>
+                        <p class="text-muted">
+                            {% trans "For companies in the biomedical engineering sector looking to support our initiatives and gain visibility among professionals." %}
+                        </p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                {% trans "Event sponsorship opportunities" %}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                {% trans "Product and service showcase" %}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                {% trans "Recruitment access to professionals" %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100" style="border-top: 4px solid var(--accent-red);">
+                    <div class="card-body p-4">
+                        <h4 class="mb-3" style="color: var(--accent-red);">
+                            <i class="fas fa-university me-2"></i>{% trans "Academic Partnership" %}
+                        </h4>
+                        <p class="text-muted">
+                            {% trans "For universities and research institutions to collaborate on educational programs, research, and knowledge exchange." %}
+                        </p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-danger me-2"></i>
+                                {% trans "Joint research projects" %}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-danger me-2"></i>
+                                {% trans "Student exchange programs" %}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-danger me-2"></i>
+                                {% trans "Curriculum development collaboration" %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-gray) 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="mb-3">{% trans "Ready to Partner with ABEA?" %}</h3>
+                <p class="mb-0 opacity-90">
+                    {% trans "Join us in advancing biomedical engineering across Africa. Contact our partnerships team to discuss opportunities." %}
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'contact' %}" class="btn btn-lg fw-bold"
+                   style="background: linear-gradient(135deg, #ffffff, var(--light-gray)); color: var(--dark-gray);">
+                    <i class="fas fa-handshake me-2"></i>{% trans "Partner with Us" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

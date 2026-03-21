@@ -1,0 +1,737 @@
+<!-- templates/abea_app/event_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ event.title }} - {% trans "Events" %}{% endblock %}
+
+{% block meta_description %}{{ event.meta_description|default:event.short_description }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" style="{% if event.banner %}background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{{ event.banner.url }}');{% else %}background: linear-gradient(135deg, var(--primary-green), var(--dark-red));{% endif %} background-size: cover; background-position: center; color: white;">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb" style="background: transparent;">
+                        <li class="breadcrumb-item"><a href="{% url 'events_list' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">{% trans "Events" %}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" style="color: white;">{{ event.title|truncatechars:30 }}</li>
+                    </ol>
+                </nav>
+
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                    <span class="badge" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.6em 1.2em;">
+                        {{ event.get_event_type_display }}
+                    </span>
+                    {% if event.is_featured %}
+                    <span class="badge" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); padding: 0.6em 1.2em;">
+                        <i class="fas fa-star me-1"></i>{% trans "Featured" %}
+                    </span>
+                    {% endif %}
+                    {% if event.is_free %}
+                    <span class="badge" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); padding: 0.6em 1.2em;">
+                        <i class="fas fa-gift me-1"></i>{% trans "Free Event" %}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <h1 class="display-5 fw-bold mb-4">{{ event.title }}</h1>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                 style="width: 50px; height: 50px; color: var(--primary-green);">
+                                <i class="fas fa-calendar-alt fa-lg"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0" style="color: rgba(255, 255, 255, 0.9);">{% trans "Date & Time" %}</h6>
+                                <p class="mb-0" style="font-size: 1.1rem;">
+                                    {{ event.start_date|date:"l, F d, Y" }}<br>
+                                    {{ event.start_date|time:"g:i A" }} - {{ event.end_date|time:"g:i A" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                 style="width: 50px; height: 50px; color: var(--primary-green);">
+                                <i class="fas fa-map-marker-alt fa-lg"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0" style="color: rgba(255, 255, 255, 0.9);">{% trans "Location" %}</h6>
+                                <p class="mb-0" style="font-size: 1.1rem;">
+                                    {% if event.is_online %}
+                                    <i class="fas fa-globe me-1"></i>{% trans "Online Event" %}<br>
+                                    <small>{{ event.online_link|truncatechars:30 }}</small>
+                                    {% else %}
+                                    {{ event.location }}<br>
+                                    <small class="text-white-50">{{ event.venue|truncatechars:30 }}</small>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if event.registration_deadline %}
+                <div class="alert alert-warning d-inline-flex align-items-center mb-0"
+                     style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
+                    <i class="fas fa-clock me-2"></i>
+                    <div>
+                        {% trans "Registration ends" %} {{ event.registration_deadline|date:"F d, Y" }}
+                        at {{ event.registration_deadline|time:"g:i A" }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4 mt-5 mt-lg-0">
+                <div class="card border-0 shadow-lg" style="background: rgba(255, 255, 255, 0.95); border-radius: 12px;">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            {% if event.is_free %}
+                            <h2 class="mb-0" style="color: var(--secondary-green);">{% trans "FREE" %}</h2>
+                            {% else %}
+                            <h2 class="mb-0" style="color: var(--primary-green);">${{ event.fee }}</h2>
+                            <p class="text-muted mb-0">{% trans "Registration Fee" %}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span style="color: var(--dark-gray); font-weight: 500;">
+                                    <i class="fas fa-users me-1"></i>{% trans "Registration" %}
+                                </span>
+                                <span style="color: var(--primary-green); font-weight: 600;">
+                                    {{ event.registered_count }}/{{ event.capacity|default:"∞" }}
+                                </span>
+                            </div>
+                            {% if event.capacity %}
+                            <div class="progress" style="height: 8px; border-radius: 4px;">
+                                <div class="progress-bar" role="progressbar"
+                                     style="width: {% widthratio event.registered_count event.capacity 100 %}%;
+                                            background: linear-gradient(135deg, var(--primary-green), var(--dark-red));">
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-1">
+                                {% widthratio event.registered_count event.capacity 100 %}% {% trans "filled" %}
+                            </small>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            {% if not is_registered %}
+                                {% if event.capacity and event.registered_count >= event.capacity %}
+                                <button class="btn btn-lg" disabled
+                                        style="background: linear-gradient(135deg, #6c757d, #495057); border: none; color: white;">
+                                    <i class="fas fa-times-circle me-2"></i>{% trans "Sold Out" %}
+                                </button>
+                                <p class="text-center text-muted small mt-2">
+                                    {% trans "This event has reached capacity." %}
+                                </p>
+                                {% else %}
+                                <button class="btn btn-lg" data-bs-toggle="modal" data-bs-target="#registrationModal"
+                                        style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                    <i class="fas fa-user-plus me-2"></i>{% trans "Register Now" %}
+                                </button>
+                                {% endif %}
+                            {% else %}
+                            <button class="btn btn-lg" disabled
+                                    style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); border: none; color: white;">
+                                <i class="fas fa-check-circle me-2"></i>{% trans "Already Registered" %}
+                            </button>
+                            <a href="#" class="btn btn-lg"
+                               style="background: linear-gradient(135deg, #6c757d, #495057); border: none; color: white;">
+                                <i class="fas fa-calendar-alt me-2"></i>{% trans "Add to Calendar" %}
+                            </a>
+                            {% endif %}
+
+                            <div class="d-flex justify-content-center gap-3 mt-3">
+                                <a href="#" class="text-decoration-none" onclick="shareEvent('facebook')" title="{% trans 'Share on Facebook' %}">
+                                    <i class="fab fa-facebook fa-lg" style="color: #1877f2;"></i>
+                                </a>
+                                <a href="#" class="text-decoration-none" onclick="shareEvent('twitter')" title="{% trans 'Share on Twitter' %}">
+                                    <i class="fab fa-twitter fa-lg" style="color: #1da1f2;"></i>
+                                </a>
+                                <a href="#" class="text-decoration-none" onclick="shareEvent('linkedin')" title="{% trans 'Share on LinkedIn' %}">
+                                    <i class="fab fa-linkedin fa-lg" style="color: #0a66c2;"></i>
+                                </a>
+                                <a href="#" class="text-decoration-none" onclick="copyEventLink()" title="{% trans 'Copy link' %}">
+                                    <i class="fas fa-link fa-lg" style="color: var(--primary-green);"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Event Details -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- About Event -->
+                <div class="card border-0 shadow-sm mb-5">
+                    <div class="card-header border-0 bg-white py-4">
+                        <h3 class="mb-0" style="color: var(--primary-green);">
+                            <i class="fas fa-info-circle me-2"></i>{% trans "About This Event" %}
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="event-description mb-5">
+                            {{ event.description|linebreaks }}
+                        </div>
+
+                        {% if event.venue %}
+                        <div class="mb-5">
+                            <h5 class="mb-3" style="color: var(--primary-green);">
+                                <i class="fas fa-map-marked-alt me-2"></i>{% trans "Venue Details" %}
+                            </h5>
+                            <div class="card" style="border-left: 4px solid var(--primary-green);">
+                                <div class="card-body">
+                                    {{ event.venue|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if event.is_online and event.online_link %}
+                        <div class="mb-5">
+                            <h5 class="mb-3" style="color: var(--primary-green);">
+                                <i class="fas fa-video me-2"></i>{% trans "Online Access" %}
+                            </h5>
+                            <div class="alert" style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(183, 28, 28, 0.1)); border-left: 4px solid var(--primary-green);">
+                                <p class="mb-2"><strong>{% trans "Join link:" %}</strong></p>
+                                <a href="{{ event.online_link }}" target="_blank" class="text-break">
+                                    {{ event.online_link }}
+                                </a>
+                                <p class="mt-3 mb-0"><strong>{% trans "Note:" %}</strong> {% trans "The link will be active 15 minutes before the event starts." %}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Event Schedule -->
+                <div class="card border-0 shadow-sm mb-5">
+                    <div class="card-header border-0 bg-white py-4">
+                        <h3 class="mb-0" style="color: var(--primary-green);">
+                            <i class="fas fa-clock me-2"></i>{% trans "Event Schedule" %}
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red));"></div>
+                                <div class="timeline-content">
+                                    <h6 style="color: var(--primary-green);">{% trans "Event Start" %}</h6>
+                                    <p class="mb-0 text-muted">
+                                        {{ event.start_date|date:"l, F d, Y" }} at {{ event.start_date|time:"g:i A" }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249);"></div>
+                                <div class="timeline-content">
+                                    <h6 style="color: var(--primary-green);">{% trans "Event End" %}</h6>
+                                    <p class="mb-0 text-muted">
+                                        {{ event.end_date|date:"l, F d, Y" }} at {{ event.end_date|time:"g:i A" }}
+                                    </p>
+                                </div>
+                            </div>
+                            {% if event.registration_deadline %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker" style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800);"></div>
+                                <div class="timeline-content">
+                                    <h6 style="color: var(--primary-green);">{% trans "Registration Deadline" %}</h6>
+                                    <p class="mb-0 text-muted">
+                                        {{ event.registration_deadline|date:"l, F d, Y" }} at {{ event.registration_deadline|time:"g:i A" }}
+                                    </p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Organizer Info -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header border-0 bg-white py-3">
+                        <h5 class="mb-0" style="color: var(--primary-green);">
+                            <i class="fas fa-user-tie me-2"></i>{% trans "Organizer" %}
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="avatar-placeholder rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                             style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white; font-size: 2rem; font-weight: 600;">
+                            {{ event.created_by.get_full_name|slice:":1"|default:event.created_by.username|slice:":1"|upper }}
+                        </div>
+                        <h6 style="color: var(--dark-gray);">{{ event.created_by.get_full_name|default:event.created_by.username }}</h6>
+                        <p class="text-muted small mb-3">{% trans "Event Organizer" %}</p>
+                        <a href="mailto:{{ event.created_by.email }}" class="btn btn-sm w-100 mb-2"
+                           style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); border: none; color: white;">
+                            <i class="fas fa-envelope me-2"></i>{% trans "Contact" %}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Event Stats -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header border-0 bg-white py-3">
+                        <h5 class="mb-0" style="color: var(--primary-green);">
+                            <i class="fas fa-chart-bar me-2"></i>{% trans "Event Stats" %}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>{% trans "Registered" %}</span>
+                                <span class="badge" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                    {{ event.registered_count }}
+                                </span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>{% trans "Capacity" %}</span>
+                                <span>{{ event.capacity|default:"Unlimited" }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>{% trans "Type" %}</span>
+                                <span>{{ event.get_event_type_display }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>{% trans "Created" %}</span>
+                                <span>{{ event.created_at|date:"M d, Y" }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Related Events -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header border-0 bg-white py-3">
+                        <h5 class="mb-0" style="color: var(--primary-green);">
+                            <i class="fas fa-calendar-week me-2"></i>{% trans "You Might Also Like" %}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for related_event in related_events|slice:":3" %}
+                            <a href="{% url 'event_detail' related_event.slug %}"
+                               class="list-group-item list-group-item-action border-0 px-0 py-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        {% if related_event.image %}
+                                        <img src="{{ related_event.image.url }}" alt="{{ related_event.title }}"
+                                             class="rounded" style="width: 50px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="rounded d-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 40px; background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                            <i class="fas fa-calendar"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-1" style="color: var(--dark-gray);">{{ related_event.title|truncatechars:40 }}</h6>
+                                        <small class="text-muted">
+                                            {{ related_event.start_date|date:"M d" }} •
+                                            {{ related_event.get_event_type_display }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Registration Modal -->
+<div class="modal fade" id="registrationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                <h5 class="modal-title">{% trans "Register for" %} {{ event.title }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {% if not request.user.is_authenticated %}
+                <div class="alert alert-info" style="border-left: 4px solid var(--primary-green);">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle fa-2x" style="color: var(--primary-green);"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6>{% trans "Sign in to register" %}</h6>
+                            <p class="mb-0">
+                                {% trans "You need to be signed in to register for this event. Please sign in or create an accounts." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center py-4">
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-lg me-3"
+                       style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white; min-width: 150px;">
+                        {% trans "Sign In" %}
+                    </a>
+                    <a href="{% url 'register' %}?next={{ request.path }}" class="btn btn-lg"
+                       style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); border: none; color: white; min-width: 150px;">
+                        {% trans "Create Account" %}
+                    </a>
+                </div>
+                {% else %}
+                <form method="post" action="{% url 'register_for_event' event.slug %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                    {% trans "Full Name" %}
+                                </label>
+                                <input type="text" class="form-control" value="{{ user.get_full_name }}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                    {% trans "Email" %}
+                                </label>
+                                <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="phone" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                            {% trans "Phone Number" %} *
+                        </label>
+                        <input type="tel" class="form-control" id="phone" name="phone" required>
+                        <small class="text-muted">{% trans "We'll use this to contact you about event updates." %}</small>
+                    </div>
+
+                    {% if not event.is_free %}
+                    <div class="mb-4">
+                        <div class="alert" style="background: linear-gradient(135deg, rgba(251, 188, 4, 0.1), rgba(230, 168, 0, 0.1)); border-left: 4px solid var(--accent-yellow);">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-circle" style="color: var(--accent-yellow);"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6>{% trans "Payment Required" %}</h6>
+                                    <p class="mb-0">
+                                        {% trans "This event requires a registration fee of $" %}{{ event.fee }}.
+                                        {% trans "You will be redirected to the payment page after registration." %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="terms" required>
+                        <label class="form-check-label" for="terms">
+                            {% trans "I agree to the" %}
+                            <a href="#" style="color: var(--primary-green);">{% trans "terms and conditions" %}</a>
+                            {% trans "and" %}
+                            <a href="#" style="color: var(--primary-green);">{% trans "privacy policy" %}</a>
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn"
+                                style="background: linear-gradient(135deg, #6c757d, #495057); border: none; color: white;"
+                                data-bs-dismiss="modal">
+                            {% trans "Cancel" %}
+                        </button>
+                        <button type="submit" class="btn"
+                                style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                            <i class="fas fa-user-plus me-2"></i>{% trans "Complete Registration" %}
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    .hero-section {
+        border-radius: 0 0 20px 20px;
+    }
+
+    .breadcrumb {
+        --bs-breadcrumb-divider: '›';
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.5em 1em;
+        border-radius: 20px;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .progress {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 30px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -30px;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px var(--primary-green);
+    }
+
+    .timeline-content {
+        padding-left: 20px;
+    }
+
+    .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: -22px;
+        top: 20px;
+        bottom: 0;
+        width: 2px;
+        background: var(--primary-green);
+    }
+
+    .avatar-placeholder {
+        font-weight: 600;
+    }
+
+    .list-group-item-action:hover {
+        background-color: rgba(46, 125, 50, 0.05);
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+        border: none;
+    }
+
+    .btn-close-white {
+        filter: invert(1);
+    }
+
+    .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+    .form-check-input:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    }
+
+    .event-description img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+
+    .event-description p {
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+    }
+
+    .event-description ul, .event-description ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .event-description li {
+        margin-bottom: 0.5rem;
+    }
+
+    .event-description h3,
+    .event-description h4,
+    .event-description h5,
+    .event-description h6 {
+        color: var(--primary-green);
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Countdown timer for registration deadline
+        {% if event.registration_deadline %}
+        const deadline = new Date('{{ event.registration_deadline|date:"c" }}').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const timeleft = deadline - now;
+
+            if (timeleft < 0) {
+                document.getElementById('registrationBtn').disabled = true;
+                document.getElementById('registrationBtn').innerHTML = '<i class="fas fa-times-circle me-2"></i>{% trans "Registration Closed" %}';
+                return;
+            }
+
+            const days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+
+            if (days > 0) {
+                document.getElementById('countdown').innerHTML = `${days}d ${hours}h ${minutes}m`;
+            } else {
+                document.getElementById('countdown').innerHTML = `${hours}h ${minutes}m`;
+            }
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 60000); // Update every minute
+        {% endif %}
+
+        // Add to calendar functionality
+        document.querySelectorAll('[onclick*="addToCalendar"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                addToCalendar();
+            });
+        });
+    });
+
+    function shareEvent(platform) {
+        const url = window.location.href;
+        const title = encodeURIComponent('{{ event.title }}');
+        const text = encodeURIComponent('{{ event.short_description }}');
+
+        let shareUrl;
+        switch(platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}&summary=${text}`;
+                break;
+        }
+
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
+
+    function copyEventLink() {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            // Show success message
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+            alert.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                {% trans "Event link copied to clipboard!" %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        });
+    }
+
+    function addToCalendar() {
+        const event = {
+            title: '{{ event.title }}',
+            description: '{{ event.short_description }}',
+            location: '{% if event.is_online %}{{ event.online_link }}{% else %}{{ event.location }}{% endif %}',
+            startTime: '{{ event.start_date|date:"c" }}',
+            endTime: '{{ event.end_date|date:"c" }}'
+        };
+
+        // Create .ics file
+        const icsContent = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//ABEA Events//EN',
+            'BEGIN:VEVENT',
+            `UID:{{ event.slug }}@abea.org`,
+            `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+            `DTSTART:${event.startTime.replace(/[-:]/g, '').split('.')[0]}Z`,
+            `DTEND:${event.endTime.replace(/[-:]/g, '').split('.')[0]}Z`,
+            `SUMMARY:${event.title}`,
+            `DESCRIPTION:${event.description}`,
+            `LOCATION:${event.location}`,
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\r\n');
+
+        const blob = new Blob([icsContent], { type: 'text/calendar' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '{{ event.slug }}.ics';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+</script>
+{% endblock %}

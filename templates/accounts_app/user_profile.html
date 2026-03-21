@@ -1,0 +1,592 @@
+<!-- templates/accounts_app/user_profile.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+    {% if is_own_profile %}
+        {% trans "My Profile" %}
+    {% else %}
+        {% trans "User Profile" %} - {{ user_profile.get_full_name|default:user_profile.username }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    {% if not is_own_profile and request.user.is_superuser %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">{% trans "Dashboard" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'manage_users' %}">{% trans "Manage Users" %}</a></li>
+                    <li class="breadcrumb-item active">{% trans "User Profile" %}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="row">
+            <!-- Profile Sidebar -->
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        {% if user_profile.profile_picture %}
+                        <img src="{{ user_profile.profile_picture.url }}" alt="{{ user_profile.get_full_name }}"
+                             class="img-fluid rounded-circle mb-3" style="width: 200px; height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mb-3 mx-auto"
+                             style="width: 200px; height: 200px; font-size: 4rem; background: linear-gradient(135deg, var(--primary-green), var(--dark-red));">
+                            {% if user_profile.first_name and user_profile.last_name %}
+                                {{ user_profile.first_name|first|upper }}{{ user_profile.last_name|first|upper }}
+                            {% elif user_profile.first_name %}
+                                {{ user_profile.first_name|first|upper }}
+                            {% elif user_profile.username %}
+                                {{ user_profile.username|first|upper }}
+                            {% else %}
+                                ?
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <h4>{{ user_profile.get_full_name|default:user_profile.username }}</h4>
+                        <p class="text-muted">{{ user_profile.email }}</p>
+
+                        <div class="d-flex flex-wrap gap-1 justify-content-center mb-3">
+                            {% if user_profile.is_active %}
+                            <span class="badge" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249);">{% trans "Active" %}</span>
+                            {% else %}
+                            <span class="badge" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f);">{% trans "Inactive" %}</span>
+                            {% endif %}
+                            {% if user_profile.is_staff %}
+                            <span class="badge" style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800); color: #333;">{% trans "Staff" %}</span>
+                            {% endif %}
+                            {% if user_profile.is_superuser %}
+                            <span class="badge" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red));">{% trans "Admin" %}</span>
+                            {% endif %}
+                            {% if user_profile.is_verified %}
+                            <span class="badge" style="background: linear-gradient(135deg, #1a73e8, #0d5bb5);">{% trans "Verified" %}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                            {% if is_own_profile %}
+                            <a href="{% url 'edit_own_profile' %}" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                <i class="fas fa-edit me-2"></i>{% trans "Edit Profile" %}
+                            </a>
+                            {% elif not is_own_profile and request.user.is_superuser %}
+                            <a href="{% url 'edit_user' user_profile.id %}" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                <i class="fas fa-edit me-2"></i>{% trans "Edit User" %}
+                            </a>
+                            {% if user_profile != request.user %}
+                            <a href="{% url 'delete_user' user_profile.id %}" class="btn" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); border: none; color: white;">
+                                <i class="fas fa-trash me-2"></i>{% trans "Delete" %}
+                            </a>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="card mt-4">
+                    <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                        <h5 class="mb-0">{% trans "Statistics" %}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="stat-number" style="color: var(--primary-green);">{{ subscriptions.count }}</div>
+                                <div class="stat-label" style="color: var(--dark-gray);">{% trans "Subscriptions" %}</div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-number" style="color: var(--primary-green);">{{ event_registrations.count }}</div>
+                                <div class="stat-label" style="color: var(--dark-gray);">{% trans "Event Registrations" %}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-number" style="color: var(--primary-green);">{{ news_articles.count }}</div>
+                                <div class="stat-label" style="color: var(--dark-gray);">{% trans "News Articles" %}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-number" style="color: var(--primary-green);">{% if user_profile.last_login %}{{ user_profile.last_login|date:"M d, Y" }}{% else %}{% trans "Never" %}{% endif %}</div>
+                                <div class="stat-label" style="color: var(--dark-gray);">{% trans "Last Login" %}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Tabs with Theme Styling -->
+                <ul class="nav nav-tabs mb-3" id="userProfileTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                            <i class="fas fa-user me-2"></i>
+                            {% if is_own_profile and form %}
+                            {% trans "Edit Profile" %}
+                            {% else %}
+                            {% trans "Profile Details" %}
+                            {% endif %}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="subscriptions-tab" data-bs-toggle="tab" data-bs-target="#subscriptions" type="button" role="tab">
+                            <i class="fas fa-credit-card me-2"></i>{% trans "Subscriptions" %}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">
+                            <i class="fas fa-calendar me-2"></i>{% trans "Event Registrations" %}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">
+                            <i class="fas fa-history me-2"></i>{% trans "Activity" %}
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="userProfileTabContent">
+                    <!-- Profile Details Tab -->
+                    <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <!-- Read-only Profile Details for Both Views -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="mb-3" style="color: var(--primary-green);">{% trans "Personal Information" %}</h6>
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <th width="40%">{% trans "Title" %}:</th>
+                                                <td>{{ user_profile.title|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Full Name" %}:</th>
+                                                <td>{{ user_profile.get_full_name|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Phone" %}:</th>
+                                                <td>{{ user_profile.phone|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Mobile" %}:</th>
+                                                <td>{{ user_profile.mobile|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Professional ID" %}:</th>
+                                                <td>{{ user_profile.professional_id|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Specialization" %}:</th>
+                                                <td>{{ user_profile.specialization|default:"-" }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h6 class="mb-3" style="color: var(--primary-green);">{% trans "Professional Information" %}</h6>
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <th width="40%">{% trans "Institution" %}:</th>
+                                                <td>{{ user_profile.institution|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Position" %}:</th>
+                                                <td>{{ user_profile.position|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Country" %}:</th>
+                                                <td>{{ user_profile.country|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "City" %}:</th>
+                                                <td>{{ user_profile.city|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Address" %}:</th>
+                                                <td>{{ user_profile.address|default:"-"|linebreaks }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Language" %}:</th>
+                                                <td>{{ user_profile.get_language_display|default:"-" }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <h6 class="mb-3" style="color: var(--primary-green);">{% trans "Membership Information" %}</h6>
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <th width="30%">{% trans "Membership Type" %}:</th>
+                                                <td>{{ user_profile.get_membership_type_display|default:"Not a member" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Membership Status" %}:</th>
+                                                <td>
+                                                    <span class="badge"
+                                                        style="{% if user_profile.membership_status == 'ACTIVE' %}background: linear-gradient(135deg, var(--secondary-green), #2d9249);
+                                                        {% elif user_profile.membership_status == 'PENDING' %}background: linear-gradient(135deg, var(--accent-yellow), #e6a800); color: #333;
+                                                        {% elif user_profile.membership_status == 'EXPIRED' %}background: linear-gradient(135deg, var(--accent-red), #d32f2f);
+                                                        {% else %}background: var(--medium-gray);{% endif %}">
+                                                        {{ user_profile.get_membership_status_display|default:"-" }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Membership Date" %}:</th>
+                                                <td>{{ user_profile.membership_date|date:"M d, Y"|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Membership Expiry" %}:</th>
+                                                <td>{{ user_profile.membership_expiry|date:"M d, Y"|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "Payment Method" %}:</th>
+                                                <td>{{ user_profile.payment_method|default:"-" }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                {% if user_profile.bio %}
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <h6 class="mb-3" style="color: var(--primary-green);">{% trans "Biography" %}</h6>
+                                        <div class="p-3" style="background-color: rgba(46, 125, 50, 0.05); border-radius: 8px;">
+                                            {{ user_profile.bio|linebreaks }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscriptions Tab -->
+                    <div class="tab-pane fade" id="subscriptions" role="tabpanel" aria-labelledby="subscriptions-tab">
+                        <div class="card">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                <h5 class="mb-0">{% trans "Subscription History" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if subscriptions %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>{% trans "Plan" %}</th>
+                                                <th>{% trans "Period" %}</th>
+                                                <th>{% trans "Amount" %}</th>
+                                                <th>{% trans "Payment Status" %}</th>
+                                                <th>{% trans "Created" %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for sub in subscriptions %}
+                                            <tr>
+                                                <td>{{ sub.membership_plan.name }}</td>
+                                                <td>
+                                                    {{ sub.start_date|date:"M d, Y" }} - {{ sub.end_date|date:"M d, Y" }}
+                                                    {% if sub.is_active %}
+                                                    <span class="badge ms-2" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249);">{% trans "Active" %}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>${{ sub.amount_paid }}</td>
+                                                <td>
+                                                    <span class="badge"
+                                                        style="{% if sub.payment_status == 'COMPLETED' %}background: linear-gradient(135deg, var(--secondary-green), #2d9249);
+                                                        {% elif sub.payment_status == 'PENDING' %}background: linear-gradient(135deg, var(--accent-yellow), #e6a800); color: #333;
+                                                        {% elif sub.payment_status == 'FAILED' %}background: linear-gradient(135deg, var(--accent-red), #d32f2f);
+                                                        {% else %}background: var(--medium-gray);{% endif %}">
+                                                        {{ sub.get_payment_status_display }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ sub.created_at|date:"M d, Y" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-credit-card fa-3x mb-3" style="color: var(--medium-gray);"></i>
+                                    <h5 style="color: var(--primary-green);">{% trans "No subscriptions found" %}</h5>
+                                    <p class="text-muted">{% trans "This user has no subscription history." %}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Registrations Tab -->
+                    <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
+                        <div class="card">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                <h5 class="mb-0">{% trans "Event Registrations" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if event_registrations %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>{% trans "Event" %}</th>
+                                                <th>{% trans "Registration Date" %}</th>
+                                                <th>{% trans "Attendance" %}</th>
+                                                <th>{% trans "Payment" %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for reg in event_registrations %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url 'event_detail' reg.event.slug %}" target="_blank" style="color: var(--primary-green); text-decoration: none;">
+                                                        {{ reg.event.title }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ reg.registration_date|date:"M d, Y" }}</td>
+                                                <td>
+                                                    {% if reg.attended %}
+                                                    <span class="badge" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249);">{% trans "Attended" %}</span>
+                                                    {% else %}
+                                                    <span class="badge" style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800); color: #333;">{% trans "Not Attended" %}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <span class="badge"
+                                                        style="{% if reg.payment_status == 'PAID' %}background: linear-gradient(135deg, var(--secondary-green), #2d9249);
+                                                        {% elif reg.payment_status == 'PENDING' %}background: linear-gradient(135deg, var(--accent-yellow), #e6a800); color: #333;
+                                                        {% elif reg.payment_status == 'REFUNDED' %}background: linear-gradient(135deg, #1a73e8, #0d5bb5);
+                                                        {% else %}background: var(--medium-gray);{% endif %}">
+                                                        {{ reg.get_payment_status_display }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-calendar fa-3x mb-3" style="color: var(--medium-gray);"></i>
+                                    <h5 style="color: var(--primary-green);">{% trans "No event registrations" %}</h5>
+                                    <p class="text-muted">{% trans "This user has not registered for any events." %}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Tab -->
+                    <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+                        <div class="card">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                <h5 class="mb-0">{% trans "Activity" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="timeline">
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red));"></div>
+                                        <div class="timeline-content">
+                                            <h6 style="color: var(--primary-green);">{% trans "Account Created" %}</h6>
+                                            <p class="text-muted small">{{ user_profile.date_joined|date:"F j, Y, g:i a" }}</p>
+                                        </div>
+                                    </div>
+
+                                    {% if user_profile.last_login %}
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249);"></div>
+                                        <div class="timeline-content">
+                                            <h6 style="color: var(--primary-green);">{% trans "Last Login" %}</h6>
+                                            <p class="text-muted small">{{ user_profile.last_login|date:"F j, Y, g:i a" }}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if user_profile.membership_date %}
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker" style="background: linear-gradient(135deg, #1a73e8, #0d5bb5);"></div>
+                                        <div class="timeline-content">
+                                            <h6 style="color: var(--primary-green);">{% trans "Membership Started" %}</h6>
+                                            <p class="text-muted small">{{ user_profile.membership_date|date:"F j, Y" }}</p>
+                                            <p>{% trans "Type" %}: {{ user_profile.get_membership_type_display }}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% for sub in subscriptions|slice:":3" %}
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker" style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800);"></div>
+                                        <div class="timeline-content">
+                                            <h6 style="color: var(--primary-green);">{% trans "Subscription Created" %}</h6>
+                                            <p class="text-muted small">{{ sub.created_at|date:"F j, Y, g:i a" }}</p>
+                                            <p>{{ sub.membership_plan.name }} - ${{ sub.amount_paid }}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    /* Tabs Styling to Match Theme - FIXED FOR VISIBILITY */
+    .nav-tabs {
+        border-bottom: 2px solid var(--primary-green);
+    }
+
+    .nav-tabs .nav-link {
+        color: var(--dark-gray);
+        border: 2px solid transparent;
+        border-radius: 8px 8px 0 0;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        margin-right: 5px;
+        transition: all 0.3s ease;
+        background-color: rgba(245, 245, 245, 0.9); /* More visible background */
+        opacity: 1 !important; /* Ensure full visibility */
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: var(--primary-green);
+        background-color: rgba(46, 125, 50, 0.15);
+        border-color: transparent;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: white;
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-red));
+        border: 2px solid var(--primary-green);
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
+        opacity: 1 !important;
+    }
+
+    .nav-tabs .nav-link.active:hover {
+        color: white;
+        background: linear-gradient(135deg, var(--dark-red), var(--primary-green));
+    }
+
+    /* Card Styling */
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        border-bottom: 3px solid var(--primary-green);
+        background-color: white;
+        font-weight: 600;
+    }
+
+    /* Table Styling */
+    .table th {
+        color: var(--primary-green);
+        font-weight: 600;
+        border-top: none;
+    }
+
+    .table td {
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(46, 125, 50, 0.05);
+    }
+
+    /* Timeline Styling */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -30px;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px var(--light-gray);
+    }
+
+    .timeline-content {
+        padding-left: 20px;
+        border-left: 2px solid var(--light-gray);
+        padding-bottom: 10px;
+    }
+
+    .timeline-item:last-child .timeline-content {
+        border-left: none;
+    }
+
+    /* Stat Number Styling */
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        color: var(--medium-gray);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 5px;
+    }
+
+    /* Badge Styling */
+    .badge {
+        font-weight: 500;
+        padding: 0.5em 0.9em;
+    }
+
+    /* Button Styling */
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 0.6rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}

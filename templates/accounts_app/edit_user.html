@@ -1,0 +1,605 @@
+<!-- templates/accounts_app/edit_user.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+    {% if is_own_profile %}
+        {% trans "Edit My Profile" %}
+    {% else %}
+        {% trans "Edit User" %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb Navigation -->
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {% if is_own_profile %}
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">{% trans "Dashboard" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'profile' %}">{% trans "My Profile" %}</a></li>
+                    <li class="breadcrumb-item active">{% trans "Edit Profile" %}</li>
+                    {% else %}
+                    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">{% trans "Dashboard" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'manage_users' %}">{% trans "Manage Users" %}</a></li>
+                    <li class="breadcrumb-item active">{% trans "Edit User" %}</li>
+                    {% endif %}
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            {% if is_own_profile %}
+                            {% trans "Edit My Profile" %}
+                            {% else %}
+                            {% trans "Edit User" %}
+                            {% endif %}
+                        </h4>
+                        <div class="d-flex gap-2">
+                            {% if is_own_profile %}
+                            <a href="{% url 'profile' %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-eye me-1"></i>{% trans "View Profile" %}
+                            </a>
+                            {% else %}
+                            <a href="{% url 'user_profile' user_obj.id %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-eye me-1"></i>{% trans "View Profile" %}
+                            </a>
+                            {% if user_obj != request.user %}
+                            <a href="{% url 'delete_user' user_obj.id %}" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-trash me-1"></i>{% trans "Delete" %}
+                            </a>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <!-- Profile Picture Section -->
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                {% if is_own_profile %}
+                                    {% if user_obj.profile_picture %}
+                                    <img src="{{ user_obj.profile_picture.url }}" alt="{{ user_obj.get_full_name }}"
+                                         class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center mb-3 mx-auto"
+                                         style="width: 150px; height: 150px; font-size: 3rem; background: linear-gradient(135deg, var(--primary-green), var(--dark-red));">
+                                        {% if user_obj.first_name and user_obj.last_name %}
+                                            {{ user_obj.first_name|first|upper }}{{ user_obj.last_name|first|upper }}
+                                        {% elif user_obj.first_name %}
+                                            {{ user_obj.first_name|first|upper }}
+                                        {% elif user_obj.username %}
+                                            {{ user_obj.username|first|upper }}
+                                        {% else %}
+                                            ?
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    <h5>{{ user_obj.get_full_name|default:user_obj.username }}</h5>
+                                    <p class="text-muted">{{ user_obj.email }}</p>
+                                    <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                        {% if user_obj.is_active %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249);">{% trans "Active" %}</span>
+                                        {% else %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f);">{% trans "Inactive" %}</span>
+                                        {% endif %}
+                                        {% if user_obj.is_staff %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800); color: #333;">{% trans "Staff" %}</span>
+                                        {% endif %}
+                                        {% if user_obj.is_superuser %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red));">{% trans "Admin" %}</span>
+                                        {% endif %}
+                                        {% if user_obj.is_verified %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #1a73e8, #0d5bb5);">{% trans "Verified" %}</span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    {% if user_obj.profile_picture %}
+                                    <img src="{{ user_obj.profile_picture.url }}" alt="{{ user_obj.get_full_name }}"
+                                         class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center mb-3 mx-auto"
+                                         style="width: 150px; height: 150px; font-size: 3rem; background: linear-gradient(135deg, var(--primary-green), var(--dark-red));">
+                                        {% if user_obj.first_name and user_obj.last_name %}
+                                            {{ user_obj.first_name|first|upper }}{{ user_obj.last_name|first|upper }}
+                                        {% elif user_obj.first_name %}
+                                            {{ user_obj.first_name|first|upper }}
+                                        {% elif user_obj.username %}
+                                            {{ user_obj.username|first|upper }}
+                                        {% else %}
+                                            ?
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    <h5>{{ user_obj.get_full_name|default:user_obj.username }}</h5>
+                                    <p class="text-muted">{{ user_obj.email }}</p>
+                                    <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                        {% if user_obj.is_active %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249);">{% trans "Active" %}</span>
+                                        {% else %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f);">{% trans "Inactive" %}</span>
+                                        {% endif %}
+                                        {% if user_obj.is_staff %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800); color: #333;">{% trans "Staff" %}</span>
+                                        {% endif %}
+                                        {% if user_obj.is_superuser %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red));">{% trans "Admin" %}</span>
+                                        {% endif %}
+                                        {% if user_obj.is_verified %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #1a73e8, #0d5bb5);">{% trans "Verified" %}</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Form Section -->
+                        <div class="col-md-9">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <!-- Display form errors -->
+                                {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{% trans "Please correct the errors below:" %}</strong>
+                                    {{ form.non_field_errors }}
+                                </div>
+                                {% endif %}
+
+                                <!-- Login Information (Admin only) -->
+                                {% if not is_own_profile and form.email %}
+                                <div class="form-section mb-4">
+                                    <h5 class="border-bottom pb-2" style="color: var(--primary-green);">{% trans "Login Information" %}</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_email" class="form-label">{% trans "Email Address (Username)" %} *</label>
+                                                {{ form.email }}
+                                                {% if form.email.errors %}
+                                                <div class="text-danger">{{ form.email.errors }}</div>
+                                                {% endif %}
+                                                <small class="text-muted">
+                                                    {% trans "This email is used as the username for login" %}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_phone" class="form-label">{% trans "Phone Number" %}</label>
+                                                {{ form.phone }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Admin-only fields -->
+                                    {% if form.is_active or form.is_staff or form.is_superuser %}
+                                    <div class="row">
+                                        {% if form.is_active %}
+                                        <div class="col-md-4">
+                                            <div class="form-check form-switch mb-3">
+                                                {{ form.is_active }}
+                                                <label class="form-check-label" for="id_is_active">
+                                                    {% trans "Active Account" %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.is_staff %}
+                                        <div class="col-md-4">
+                                            <div class="form-check form-switch mb-3">
+                                                {{ form.is_staff }}
+                                                <label class="form-check-label" for="id_is_staff">
+                                                    {% trans "Staff Member" %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.is_superuser %}
+                                        <div class="col-md-4">
+                                            <div class="form-check form-switch mb-3">
+                                                {{ form.is_superuser }}
+                                                <label class="form-check-label" for="id_is_superuser">
+                                                    {% trans "Superuser" %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                <!-- Personal Information -->
+                                {% if form.title or form.first_name or form.last_name %}
+                                <div class="form-section mb-4">
+                                    <h5 class="border-bottom pb-2" style="color: var(--primary-green);">{% trans "Personal Information" %}</h5>
+                                    <div class="row">
+                                        {% if form.title %}
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label for="id_title" class="form-label">{% trans "Title" %}</label>
+                                                {{ form.title }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        <div class="col-md-5">
+                                            <div class="mb-3">
+                                                <label for="id_first_name" class="form-label">{% trans "First Name" %}</label>
+                                                {{ form.first_name }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="mb-3">
+                                                <label for="id_last_name" class="form-label">{% trans "Last Name" %}</label>
+                                                {{ form.last_name }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if is_own_profile and form.email %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_email" class="form-label">{% trans "Email Address" %} *</label>
+                                                {{ form.email }}
+                                                {% if form.email.errors %}
+                                                <div class="text-danger">{{ form.email.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_phone" class="form-label">{% trans "Phone Number" %}</label>
+                                                {{ form.phone }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                <!-- Professional Information -->
+                                {% if form.professional_id or form.specialization or form.institution or form.position %}
+                                <div class="form-section mb-4">
+                                    <h5 class="border-bottom pb-2" style="color: var(--primary-green);">{% trans "Professional Information" %}</h5>
+                                    <div class="row">
+                                        {% if form.professional_id %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_professional_id" class="form-label">{% trans "Professional ID" %}</label>
+                                                {{ form.professional_id }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.specialization %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_specialization" class="form-label">{% trans "Specialization" %}</label>
+                                                {{ form.specialization }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="row">
+                                        {% if form.institution %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_institution" class="form-label">{% trans "Institution/Organization" %}</label>
+                                                {{ form.institution }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.position %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_position" class="form-label">{% trans "Position" %}</label>
+                                                {{ form.position }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Address Information -->
+                                {% if form.country or form.city or form.address %}
+                                <div class="form-section mb-4">
+                                    <h5 class="border-bottom pb-2" style="color: var(--primary-green);">{% trans "Address Information" %}</h5>
+                                    <div class="row">
+                                        {% if form.country %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_country" class="form-label">{% trans "Country" %}</label>
+                                                {{ form.country }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.city %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_city" class="form-label">{% trans "City" %}</label>
+                                                {{ form.city }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if form.address %}
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <label for="id_address" class="form-label">{% trans "Address" %}</label>
+                                                {{ form.address }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                <!-- Profile Information -->
+                                {% if form.profile_picture or form.bio %}
+                                <div class="form-section mb-4">
+                                    <h5 class="border-bottom pb-2" style="color: var(--primary-green);">{% trans "Profile Information" %}</h5>
+                                    <div class="row">
+                                        {% if form.profile_picture %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_profile_picture" class="form-label">{% trans "Profile Picture" %}</label>
+                                                {{ form.profile_picture }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if form.bio %}
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <label for="id_bio" class="form-label">{% trans "Biography" %}</label>
+                                                {{ form.bio }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                <!-- Membership Information -->
+                                {% if form.membership_type or form.membership_status or form.membership_date or form.membership_expiry %}
+                                <div class="form-section mb-4">
+                                    <h5 class="border-bottom pb-2" style="color: var(--primary-green);">{% trans "Membership Information" %}</h5>
+                                    <div class="row">
+                                        {% if form.membership_type %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_membership_type" class="form-label">{% trans "Membership Type" %}</label>
+                                                {{ form.membership_type }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.membership_status %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_membership_status" class="form-label">{% trans "Membership Status" %}</label>
+                                                {{ form.membership_status }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="row">
+                                        {% if form.membership_date %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_membership_date" class="form-label">{% trans "Membership Date" %}</label>
+                                                {{ form.membership_date }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.membership_expiry %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_membership_expiry" class="form-label">{% trans "Membership Expiry" %}</label>
+                                                {{ form.membership_expiry }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Payment and Preferences -->
+                                {% if form.payment_method or form.language %}
+                                <div class="form-section mb-4">
+                                    <h5 class="border-bottom pb-2" style="color: var(--primary-green);">{% trans "Payment & Preferences" %}</h5>
+                                    <div class="row">
+                                        {% if form.payment_method %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_payment_method" class="form-label">{% trans "Preferred Payment Method" %}</label>
+                                                {{ form.payment_method }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.language %}
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="id_language" class="form-label">{% trans "Preferred Language" %}</label>
+                                                {{ form.language }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Verification (Admin only) -->
+                                {% if not is_own_profile and form.is_verified %}
+                                <div class="form-section mb-4">
+                                    <h5 class="border-bottom pb-2" style="color: var(--primary-green);">{% trans "Verification" %}</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check mb-3">
+                                                {{ form.is_verified }}
+                                                <label class="form-check-label" for="id_is_verified">
+                                                    {% trans "Verified Account" %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex justify-content-between mt-4">
+                                    <div>
+                                        {% if is_own_profile %}
+                                        <a href="{% url 'profile' %}" class="btn btn-secondary">
+                                            <i class="fas fa-times me-2"></i>{% trans "Cancel" %}
+                                        </a>
+                                        {% else %}
+                                        <a href="{% url 'manage_users' %}" class="btn btn-secondary">
+                                            <i class="fas fa-times me-2"></i>{% trans "Cancel" %}
+                                        </a>
+                                        {% if not is_own_profile and user_obj != request.user and form.is_active %}
+                                        <button type="button" class="btn btn-warning toggle-active-btn ms-2"
+                                                data-user-id="{{ user_obj.id }}"
+                                                data-is-active="{{ user_obj.is_active|yesno:'true,false' }}">
+                                            <i class="fas {% if user_obj.is_active %}fa-user-slash{% else %}fa-user-check{% endif %} me-2"></i>
+                                            {% if user_obj.is_active %}{% trans "Deactivate" %}{% else %}{% trans "Activate" %}{% endif %}
+                                        </button>
+                                        {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if is_own_profile %}
+                                        {% trans "Update Profile" %}
+                                        {% else %}
+                                        {% trans "Update User" %}
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    .form-section {
+        background-color: rgba(245, 245, 245, 0.5);
+        padding: 1.5rem;
+        border-radius: 10px;
+        border-left: 4px solid var(--primary-green);
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section h5 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--dark-gray);
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+    .form-switch .form-check-input:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle active status (Admin only)
+        const toggleBtn = document.querySelector('.toggle-active-btn');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const isActive = this.dataset.isActive === 'true';
+
+                if (confirm(isActive
+                    ? "{% trans 'Are you sure you want to deactivate this user?' %}"
+                    : "{% trans 'Are you sure you want to activate this user?' %}")) {
+
+                    fetch("{% url 'toggle_user_active' 999 %}".replace('999', userId), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.error || 'An error occurred');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred');
+                    });
+                }
+            });
+        }
+
+        // Add form control classes
+        const formControls = document.querySelectorAll('input, select, textarea');
+        formControls.forEach(control => {
+            if (!control.classList.contains('form-check-input')) {
+                control.classList.add('form-control');
+            }
+        });
+    });
+</script>
+{% endblock %}

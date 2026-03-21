@@ -1,0 +1,609 @@
+{#{% extends 'base.html' %}#}
+{#{% load static i18n %}#}
+{##}
+{#{% block title %}{% trans "Payment Failed" %} - ABEA{% endblock %}#}
+{##}
+{#{% block extra_css %}#}
+{#<style>#}
+{#    :root {#}
+{#        --primary-green: #2e7d32;#}
+{#        --secondary-green: #4caf50;#}
+{#        --accent-red: #d32f2f;#}
+{#        --dark-red: #b71c1c;#}
+{#        --light-gray: #f5f5f5;#}
+{#        --medium-gray: #9e9e9e;#}
+{#        --dark-gray: #424242;#}
+{#        --accent-yellow: #fbbc04;#}
+{#    }#}
+{#    #}
+{#    .payment-failed-container {#}
+{#        min-height: 70vh;#}
+{#        display: flex;#}
+{#        align-items: center;#}
+{#        justify-content: center;#}
+{#        padding: 40px 20px;#}
+{#    }#}
+{#    #}
+{#    .failed-card {#}
+{#        background: white;#}
+{#        border-radius: 20px;#}
+{#        padding: 40px;#}
+{#        max-width: 600px;#}
+{#        width: 100%;#}
+{#        box-shadow: 0 20px 60px rgba(211, 47, 47, 0.15);#}
+{#        border-top: 8px solid var(--accent-red);#}
+{#        text-align: center;#}
+{#        position: relative;#}
+{#        overflow: hidden;#}
+{#    }#}
+{#    #}
+{#    .failed-card::before {#}
+{#        content: '';#}
+{#        position: absolute;#}
+{#        top: 0;#}
+{#        left: 0;#}
+{#        right: 0;#}
+{#        height: 4px;#}
+{#        background: linear-gradient(90deg, var(--accent-red), var(--dark-red), var(--accent-red));#}
+{#        animation: shimmer 3s infinite linear;#}
+{#    }#}
+{#    #}
+{#    @keyframes shimmer {#}
+{#        0% { background-position: -600px 0; }#}
+{#        100% { background-position: 600px 0; }#}
+{#    }#}
+{#    #}
+{#    .failed-icon {#}
+{#        width: 120px;#}
+{#        height: 120px;#}
+{#        border-radius: 50%;#}
+{#        background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(183, 28, 28, 0.05));#}
+{#        display: flex;#}
+{#        align-items: center;#}
+{#        justify-content: center;#}
+{#        margin: 0 auto 30px;#}
+{#        position: relative;#}
+{#    }#}
+{#    #}
+{#    .failed-icon::after {#}
+{#        content: '';#}
+{#        position: absolute;#}
+{#        width: 100%;#}
+{#        height: 100%;#}
+{#        border-radius: 50%;#}
+{#        border: 2px dashed var(--accent-red);#}
+{#        opacity: 0.3;#}
+{#        animation: spin 20s linear infinite;#}
+{#    }#}
+{#    #}
+{#    @keyframes spin {#}
+{#        100% { transform: rotate(360deg); }#}
+{#    }#}
+{#    #}
+{#    .failed-icon i {#}
+{#        font-size: 50px;#}
+{#        color: var(--accent-red);#}
+{#        z-index: 1;#}
+{#    }#}
+{#    #}
+{#    .failed-title {#}
+{#        color: var(--accent-red);#}
+{#        font-size: 2.5rem;#}
+{#        font-weight: 700;#}
+{#        margin-bottom: 15px;#}
+{#        line-height: 1.2;#}
+{#    }#}
+{#    #}
+{#    .failed-message {#}
+{#        color: var(--dark-gray);#}
+{#        font-size: 1.2rem;#}
+{#        line-height: 1.6;#}
+{#        margin-bottom: 30px;#}
+{#        max-width: 500px;#}
+{#        margin-left: auto;#}
+{#        margin-right: auto;#}
+{#    }#}
+{#    #}
+{#    .subscription-info {#}
+{#        background: linear-gradient(135deg, rgba(255, 248, 248, 0.8), rgba(255, 240, 240, 0.9));#}
+{#        border-radius: 12px;#}
+{#        padding: 25px;#}
+{#        margin: 30px 0;#}
+{#        border: 1px solid rgba(211, 47, 47, 0.1);#}
+{#        text-align: left;#}
+{#    }#}
+{#    #}
+{#    .info-row {#}
+{#        display: flex;#}
+{#        margin-bottom: 12px;#}
+{#        padding-bottom: 12px;#}
+{#        border-bottom: 1px solid rgba(0, 0, 0, 0.05);#}
+{#    }#}
+{#    #}
+{#    .info-row:last-child {#}
+{#        margin-bottom: 0;#}
+{#        padding-bottom: 0;#}
+{#        border-bottom: none;#}
+{#    }#}
+{#    #}
+{#    .info-label {#}
+{#        font-weight: 600;#}
+{#        color: var(--accent-red);#}
+{#        min-width: 150px;#}
+{#    }#}
+{#    #}
+{#    .error-details {#}
+{#        background: rgba(211, 47, 47, 0.05);#}
+{#        border-radius: 10px;#}
+{#        padding: 20px;#}
+{#        margin: 25px 0;#}
+{#        text-align: left;#}
+{#    }#}
+{#    #}
+{#    .error-details summary {#}
+{#        font-weight: 600;#}
+{#        color: var(--accent-red);#}
+{#        cursor: pointer;#}
+{#        padding: 5px 0;#}
+{#        list-style: none;#}
+{#        position: relative;#}
+{#        padding-left: 25px;#}
+{#    }#}
+{#    #}
+{#    .error-details summary::before {#}
+{#        content: '▶';#}
+{#        position: absolute;#}
+{#        left: 0;#}
+{#        transition: transform 0.3s ease;#}
+{#    }#}
+{#    #}
+{#    .error-details[open] summary::before {#}
+{#        transform: rotate(90deg);#}
+{#    }#}
+{#    #}
+{#    .error-details pre {#}
+{#        margin-top: 15px;#}
+{#        padding: 15px;#}
+{#        background: rgba(0, 0, 0, 0.02);#}
+{#        border-radius: 8px;#}
+{#        border-left: 4px solid var(--accent-red);#}
+{#        overflow-x: auto;#}
+{#        font-family: 'Courier New', monospace;#}
+{#        font-size: 0.9rem;#}
+{#        line-height: 1.5;#}
+{#    }#}
+{#    #}
+{#    .action-buttons {#}
+{#        display: flex;#}
+{#        flex-wrap: wrap;#}
+{#        gap: 15px;#}
+{#        justify-content: center;#}
+{#        margin-top: 30px;#}
+{#    }#}
+{#    #}
+{#    .btn {#}
+{#        padding: 14px 30px;#}
+{#        border-radius: 10px;#}
+{#        font-weight: 600;#}
+{#        text-decoration: none;#}
+{#        display: inline-flex;#}
+{#        align-items: center;#}
+{#        justify-content: center;#}
+{#        transition: all 0.3s ease;#}
+{#        min-width: 180px;#}
+{#        border: none;#}
+{#        cursor: pointer;#}
+{#    }#}
+{#    #}
+{#    .btn-retry {#}
+{#        background: linear-gradient(135deg, var(--accent-red), var(--dark-red));#}
+{#        color: white;#}
+{#        box-shadow: 0 6px 20px rgba(211, 47, 47, 0.3);#}
+{#    }#}
+{#    #}
+{#    .btn-retry:hover {#}
+{#        transform: translateY(-3px);#}
+{#        box-shadow: 0 10px 30px rgba(211, 47, 47, 0.4);#}
+{#        background: linear-gradient(135deg, var(--dark-red), var(--accent-red));#}
+{#        color: white;#}
+{#    }#}
+{#    #}
+{#    .btn-alternative {#}
+{#        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));#}
+{#        color: white;#}
+{#        box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);#}
+{#    }#}
+{#    #}
+{#    .btn-alternative:hover {#}
+{#        transform: translateY(-3px);#}
+{#        box-shadow: 0 10px 30px rgba(46, 125, 50, 0.4);#}
+{#        background: linear-gradient(135deg, var(--secondary-green), var(--primary-green));#}
+{#        color: white;#}
+{#    }#}
+{#    #}
+{#    .btn-support {#}
+{#        background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray));#}
+{#        color: white;#}
+{#    }#}
+{#    #}
+{#    .btn-support:hover {#}
+{#        transform: translateY(-3px);#}
+{#        box-shadow: 0 10px 30px rgba(66, 66, 66, 0.3);#}
+{#        background: linear-gradient(135deg, var(--dark-gray), var(--medium-gray));#}
+{#        color: white;#}
+{#    }#}
+{#    #}
+{#    .btn-outline {#}
+{#        background: transparent;#}
+{#        color: var(--accent-red);#}
+{#        border: 2px solid var(--accent-red);#}
+{#    }#}
+{#    #}
+{#    .btn-outline:hover {#}
+{#        background: var(--accent-red);#}
+{#        color: white;#}
+{#        transform: translateY(-3px);#}
+{#        box-shadow: 0 6px 20px rgba(211, 47, 47, 0.3);#}
+{#    }#}
+{#    #}
+{#    .troubleshooting {#}
+{#        margin-top: 40px;#}
+{#        padding: 25px;#}
+{#        background: linear-gradient(135deg, rgba(46, 125, 50, 0.03), rgba(76, 175, 80, 0.02));#}
+{#        border-radius: 12px;#}
+{#        text-align: left;#}
+{#    }#}
+{#    #}
+{#    .troubleshooting h5 {#}
+{#        color: var(--primary-green);#}
+{#        margin-bottom: 15px;#}
+{#        display: flex;#}
+{#        align-items: center;#}
+{#        gap: 10px;#}
+{#    }#}
+{#    #}
+{#    .tips-list {#}
+{#        list-style: none;#}
+{#        padding-left: 0;#}
+{#    }#}
+{#    #}
+{#    .tips-list li {#}
+{#        padding: 10px 0 10px 35px;#}
+{#        position: relative;#}
+{#        border-bottom: 1px solid rgba(0, 0, 0, 0.05);#}
+{#    }#}
+{#    #}
+{#    .tips-list li:last-child {#}
+{#        border-bottom: none;#}
+{#    }#}
+{#    #}
+{#    .tips-list li::before {#}
+{#        content: '✓';#}
+{#        position: absolute;#}
+{#        left: 0;#}
+{#        top: 10px;#}
+{#        width: 25px;#}
+{#        height: 25px;#}
+{#        background: var(--primary-green);#}
+{#        color: white;#}
+{#        border-radius: 50%;#}
+{#        display: flex;#}
+{#        align-items: center;#}
+{#        justify-content: center;#}
+{#        font-size: 0.8rem;#}
+{#        font-weight: bold;#}
+{#    }#}
+{#    #}
+{#    .contact-support {#}
+{#        margin-top: 30px;#}
+{#        padding: 20px;#}
+{#        background: linear-gradient(135deg, rgba(251, 188, 4, 0.1), rgba(255, 193, 7, 0.05));#}
+{#        border-radius: 12px;#}
+{#        border: 1px solid rgba(251, 188, 4, 0.2);#}
+{#    }#}
+{#    #}
+{#    .contact-support h6 {#}
+{#        color: var(--accent-yellow);#}
+{#        margin-bottom: 10px;#}
+{#        display: flex;#}
+{#        align-items: center;#}
+{#        gap: 10px;#}
+{#    }#}
+{#    #}
+{#    @media (max-width: 768px) {#}
+{#        .failed-card {#}
+{#            padding: 30px 20px;#}
+{#        }#}
+{#        #}
+{#        .failed-title {#}
+{#            font-size: 2rem;#}
+{#        }#}
+{#        #}
+{#        .failed-icon {#}
+{#            width: 100px;#}
+{#            height: 100px;#}
+{#        }#}
+{#        #}
+{#        .failed-icon i {#}
+{#            font-size: 40px;#}
+{#        }#}
+{#        #}
+{#        .action-buttons {#}
+{#            flex-direction: column;#}
+{#        }#}
+{#        #}
+{#        .btn {#}
+{#            width: 100%;#}
+{#        }#}
+{#        #}
+{#        .info-row {#}
+{#            flex-direction: column;#}
+{#        }#}
+{#        #}
+{#        .info-label {#}
+{#            min-width: auto;#}
+{#            margin-bottom: 5px;#}
+{#        }#}
+{#    }#}
+{#</style>#}
+{#{% endblock %}#}
+{##}
+{#{% block content %}#}
+{#<div class="payment-failed-container">#}
+{#    <div class="failed-card">#}
+{#        <!-- Animated Failed Icon -->#}
+{#        <div class="failed-icon">#}
+{#            <i class="fas fa-times-circle"></i>#}
+{#        </div>#}
+{#        #}
+{#        <!-- Title -->#}
+{#        <h1 class="failed-title">{% trans "Payment Failed" %}</h1>#}
+{#        #}
+{#        <!-- Main Message -->#}
+{#        <div class="failed-message">#}
+{#            {% trans "We were unable to process your payment. Please try again or use an alternative payment method." %}#}
+{#        </div>#}
+{#        #}
+{#        <!-- Subscription Information -->#}
+{#        <div class="subscription-info">#}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Plan" %}:</div>#}
+{#                <div>{{ subscription.membership_plan.name }}</div>#}
+{#            </div>#}
+{#            #}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Amount" %}:</div>#}
+{#                <div><strong style="color: var(--accent-red);">${{ subscription.amount_paid }}</strong></div>#}
+{#            </div>#}
+{#            #}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Payment Method" %}:</div>#}
+{#                <div>{{ subscription.get_payment_method_display }}</div>#}
+{#            </div>#}
+{#            #}
+{#            {% if subscription.transaction_id %}#}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Transaction ID" %}:</div>#}
+{#                <div class="font-monospace" style="font-size: 0.9rem;">{{ subscription.transaction_id }}</div>#}
+{#            </div>#}
+{#            {% endif %}#}
+{#            #}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Date & Time" %}:</div>#}
+{#                <div>{{ subscription.created_at|date:"F j, Y g:i A" }}</div>#}
+{#            </div>#}
+{#        </div>#}
+{#        #}
+{#        <!-- Error Details (Collapsible) -->#}
+{#        <details class="error-details">#}
+{#            <summary>{% trans "View Error Details" %}</summary>#}
+{#            <pre>{{ error_details|default:"No detailed error information available." }}</pre>#}
+{#        </details>#}
+{#        #}
+{#        <!-- Action Buttons -->#}
+{#        <div class="action-buttons">#}
+{#            <a href="{% url 'initiate_payment' subscription.membership_plan.id %}" #}
+{#               class="btn btn-retry">#}
+{#                <i class="fas fa-redo me-2"></i>{% trans "Try Again" %}#}
+{#            </a>#}
+{#            #}
+{#            <a href="{% url 'membership' %}" #}
+{#               class="btn btn-alternative">#}
+{#                <i class="fas fa-exchange-alt me-2"></i>{% trans "Try Different Method" %}#}
+{#            </a>#}
+{#            #}
+{#            <a href="{% url 'dashboard' %}" #}
+{#               class="btn btn-support">#}
+{#                <i class="fas fa-tachometer-alt me-2"></i>{% trans "Go to Dashboard" %}#}
+{#            </a>#}
+{#        </div>#}
+{#        #}
+{#        <!-- Troubleshooting Tips -->#}
+{#        <div class="troubleshooting">#}
+{#            <h5>#}
+{#                <i class="fas fa-lightbulb"></i>#}
+{#                {% trans "Troubleshooting Tips" %}#}
+{#            </h5>#}
+{#            <ul class="tips-list">#}
+{#                <li>{% trans "Check your account balance or credit limit" %}</li>#}
+{#                <li>{% trans "Verify your payment information is correct" %}</li>#}
+{#                <li>{% trans "Try using a different payment method" %}</li>#}
+{#                <li>{% trans "Clear your browser cache and cookies" %}</li>#}
+{#                <li>{% trans "Ensure your internet connection is stable" %}</li>#}
+{#                <li>{% trans "Contact your bank if using credit/debit card" %}</li>#}
+{#            </ul>#}
+{#        </div>#}
+{#        #}
+{#        <!-- Contact Support -->#}
+{#        <div class="contact-support">#}
+{#            <h6>#}
+{#                <i class="fas fa-headset"></i>#}
+{#                {% trans "Need Help?" %}#}
+{#            </h6>#}
+{#            <p class="mb-2">#}
+{#                {% trans "If you continue to experience issues, please contact our support team:" %}#}
+{#            </p>#}
+{#            <div class="d-flex flex-wrap gap-3">#}
+{#                <a href="mailto:support@abea.org" class="btn btn-outline" style="padding: 8px 20px;">#}
+{#                    <i class="fas fa-envelope me-2"></i>support@abea.org#}
+{#                </a>#}
+{#                <a href="tel:+260123456789" class="btn btn-outline" style="padding: 8px 20px;">#}
+{#                    <i class="fas fa-phone me-2"></i>+260 123 456 789#}
+{#                </a>#}
+{#                <a href="{% url 'contact' %}" class="btn btn-outline" style="padding: 8px 20px;">#}
+{#                    <i class="fas fa-comments me-2"></i>{% trans "Contact Form" %}#}
+{#                </a>#}
+{#            </div>#}
+{#        </div>#}
+{#        #}
+{#        <!-- Auto-retry Notice -->#}
+{#        <div class="mt-4 text-center">#}
+{#            <small class="text-muted">#}
+{#                <i class="fas fa-info-circle me-1"></i>#}
+{#                {% trans "Your subscription is still pending. You can retry payment anytime." %}#}
+{#            </small>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+{##}
+{#<script>#}
+{#document.addEventListener('DOMContentLoaded', function() {#}
+{#    // Add some interactive elements#}
+{#    const errorDetails = document.querySelector('.error-details');#}
+{#    const retryBtn = document.querySelector('.btn-retry');#}
+{#    #}
+{#    // Animate the retry button on hover#}
+{#    retryBtn.addEventListener('mouseenter', function() {#}
+{#        const icon = this.querySelector('i');#}
+{#        icon.style.transform = 'rotate(360deg)';#}
+{#        icon.style.transition = 'transform 0.5s ease';#}
+{#    });#}
+{#    #}
+{#    retryBtn.addEventListener('mouseleave', function() {#}
+{#        const icon = this.querySelector('i');#}
+{#        icon.style.transform = 'rotate(0deg)';#}
+{#    });#}
+{#    #}
+{#    // Add click effect to all buttons#}
+{#    document.querySelectorAll('.btn').forEach(button => {#}
+{#        button.addEventListener('click', function() {#}
+{#            this.style.transform = 'scale(0.98)';#}
+{#            setTimeout(() => {#}
+{#                this.style.transform = '';#}
+{#            }, 150);#}
+{#        });#}
+{#    });#}
+{#    #}
+{#    // Show error details if there are any#}
+{#    const errorPre = document.querySelector('.error-details pre');#}
+{#    if (errorPre && errorPre.textContent.trim() === 'No detailed error information available.') {#}
+{#        errorDetails.style.display = 'none';#}
+{#    }#}
+{#    #}
+{#    // Add auto-retry timer if there's a pending subscription#}
+{#    {% if subscription.payment_status == 'PENDING' %}#}
+{#    let retryCount = 0;#}
+{#    const maxRetries = 3;#}
+{#    #}
+{#    function checkAutoRetry() {#}
+{#        if (retryCount < maxRetries) {#}
+{#            retryCount++;#}
+{#            console.log(`Auto-retry available (${retryCount}/${maxRetries})`);#}
+{#        }#}
+{#    }#}
+{#    #}
+{#    // Check every 30 seconds#}
+{#    setInterval(checkAutoRetry, 30000);#}
+{#    {% endif %}#}
+{#});#}
+{#</script>#}
+{#{% endblock %}#}
+
+
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-times-circle me-2"></i>{% trans "Payment Failed" %}
+                    </h4>
+                </div>
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 5rem;"></i>
+                    </div>
+
+                    <h3 class="mb-3">{% trans "Your payment could not be processed" %}</h3>
+
+                    {% if error_message %}
+                        <p class="text-muted mb-4">{{ error_message }}</p>
+                    {% else %}
+                        <p class="text-muted mb-4">
+                            {% trans "We were unable to process your payment. This could be due to:" %}
+                        </p>
+
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-2">
+                                <i class="fas fa-times text-danger me-2"></i>
+                                {% trans "Insufficient funds in your mobile money account" %}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-times text-danger me-2"></i>
+                                {% trans "You cancelled the payment on your phone" %}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-times text-danger me-2"></i>
+                                {% trans "Network issues with the payment provider" %}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-times text-danger me-2"></i>
+                                {% trans "Invalid mobile money number" %}
+                            </li>
+                        </ul>
+                    {% endif %}
+
+                    {% if plan %}
+                        <div class="alert alert-info mb-4">
+                            <h5>{% trans "Payment Details" %}</h5>
+                            <p class="mb-1"><strong>{% trans "Plan:" %}</strong> {{ plan.name }}</p>
+                            <p class="mb-1"><strong>{% trans "Amount:" %}</strong> {{ plan.currency }} {{ plan.price }}</p>
+                            {% if phone %}
+                                <p class="mb-1"><strong>{% trans "Phone:" %}</strong> {{ phone }}</p>
+                            {% endif %}
+                            {% if network %}
+                                <p class="mb-1"><strong>{% trans "Network:" %}</strong> {{ network }}</p>
+                            {% endif %}
+                            <p class="mb-0"><strong>{% trans "Transaction ID:" %}</strong> {{ transaction_id }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'membership' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>{% trans "Back to Membership Plans" %}
+                        </a>
+                        <a href="{% url 'contact' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-headset me-2"></i>{% trans "Contact Support" %}
+                        </a>
+                    </div>
+
+                    {% if transaction_id %}
+                        <div class="mt-4">
+                            <small class="text-muted">
+                                {% trans "Transaction ID:" %} {{ transaction_id }}
+                            </small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

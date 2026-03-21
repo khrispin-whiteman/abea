@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Payment Outcome" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    .outcome-card {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .status-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 3rem;
+    }
+
+    .status-icon.success {
+        background: rgba(46, 125, 50, 0.1);
+        color: var(--primary-green);
+        border: 3px solid var(--primary-green);
+    }
+
+    .status-icon.failed {
+        background: rgba(211, 47, 47, 0.1);
+        color: var(--accent-red);
+        border: 3px solid var(--accent-red);
+    }
+
+    .status-icon.pending {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ff9800;
+        border: 3px solid #ff9800;
+    }
+
+    .status-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .status-title.success {
+        color: var(--primary-green);
+    }
+
+    .status-title.failed {
+        color: var(--accent-red);
+    }
+
+    .status-title.pending {
+        color: #ff9800;
+    }
+
+    .details-box {
+        background: var(--light-gray);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        text-align: left;
+    }
+
+    .details-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .details-row:last-child {
+        border-bottom: none;
+    }
+
+    .details-label {
+        color: var(--dark-gray);
+        font-weight: 500;
+    }
+
+    .details-value {
+        font-weight: 600;
+        color: var(--primary-green);
+    }
+
+    .btn-outcome {
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin: 0.5rem;
+    }
+
+    .btn-outcome-primary {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border: none;
+        color: white;
+    }
+
+    .btn-outcome-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+        color: white;
+    }
+
+    .btn-outcome-secondary {
+        background: white;
+        border: 2px solid var(--primary-green);
+        color: var(--primary-green);
+    }
+
+    .btn-outcome-secondary:hover {
+        background: var(--primary-green);
+        color: white;
+    }
+
+    .refresh-message {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: rgba(33, 150, 243, 0.1);
+        border-left: 4px solid #2196F3;
+        border-radius: 8px;
+        text-align: left;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Back to Membership Link -->
+            <div class="mb-4">
+                <a href="{% url 'membership' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>{% trans "Back to Membership Plans" %}
+                </a>
+            </div>
+
+            <!-- Outcome Card -->
+            <div class="outcome-card">
+                <!-- Status Icon -->
+                {% if subscription.payment_status == 'COMPLETED' %}
+                <div class="status-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="status-title success">{% trans "Payment Successful!" %}</h2>
+                <p class="text-muted">{% trans "Thank you for your payment. Your membership is now active." %}</p>
+
+                {% elif subscription.payment_status == 'FAILED' %}
+                <div class="status-icon failed">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <h2 class="status-title failed">{% trans "Payment Failed" %}</h2>
+                <p class="text-muted">{% trans "We were unable to process your payment. Please try again." %}</p>
+
+                {% elif subscription.payment_status == 'PENDING' %}
+                <div class="status-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h2 class="status-title pending">{% trans "Payment Pending" %}</h2>
+                <p class="text-muted">{% trans "Your payment is being processed. This may take a few moments." %}</p>
+
+                {% else %}
+                <div class="status-icon pending">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <h2 class="status-title pending">{% trans "Payment Status Unknown" %}</h2>
+                <p class="text-muted">{% trans "We couldn't determine the status of your payment. Please check your subscriptions." %}</p>
+                {% endif %}
+
+                <!-- Transaction Details -->
+                <div class="details-box">
+                    <div class="details-row">
+                        <span class="details-label">{% trans "Subscription ID:" %}</span>
+                        <span class="details-value">#{{ subscription.id }}</span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">{% trans "Plan:" %}</span>
+                        <span class="details-value">{{ subscription.membership_plan.name }}</span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">{% trans "Amount Paid:" %}</span>
+                        <span class="details-value">{{ subscription.membership_plan.currency }} {{ subscription.amount_paid }}</span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">{% trans "Payment Method:" %}</span>
+                        <span class="details-value">{{ subscription.get_payment_method_display }}</span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">{% trans "Transaction ID:" %}</span>
+                        <span class="details-value text-truncate" style="max-width: 200px;">{{ subscription.transaction_id }}</span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">{% trans "Reference Number:" %}</span>
+                        <span class="details-value">{{ subscription.reference_number }}</span>
+                    </div>
+                </div>
+
+                <!-- Special messages for pending status -->
+                {% if subscription.payment_status == 'PENDING' %}
+                <div class="refresh-message">
+                    <h6><i class="fas fa-sync-alt me-2"></i>{% trans "Still waiting?" %}</h6>
+                    <p class="mb-2">{% trans "If you've already completed the payment, it may take a few seconds for the confirmation to arrive." %}</p>
+                    <button onclick="location.reload()" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-sync-alt me-2"></i>{% trans "Refresh Page" %}
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="mt-4">
+                    {% if subscription.payment_status == 'COMPLETED' %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-outcome btn-outcome-primary">
+                        <i class="fas fa-tachometer-alt me-2"></i>{% trans "Go to Dashboard" %}
+                    </a>
+                    {% elif subscription.payment_status == 'FAILED' %}
+                    <a href="{% url 'initiate_payment' subscription.membership_plan.id %}" class="btn btn-outcome btn-outcome-primary">
+                        <i class="fas fa-redo me-2"></i>{% trans "Try Again" %}
+                    </a>
+                    {% else %}
+                    <a href="{% url 'membership' %}" class="btn btn-outcome btn-outcome-secondary">
+                        <i class="fas fa-list me-2"></i>{% trans "View All Plans" %}
+                    </a>
+                    {% endif %}
+
+                    <a href="{% url 'contact' %}" class="btn btn-outcome btn-outcome-secondary">
+                        <i class="fas fa-headset me-2"></i>{% trans "Contact Support" %}
+                    </a>
+                </div>
+            </div>
+
+            <!-- Additional Help -->
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h5 style="color: var(--primary-green);">
+                        <i class="fas fa-question-circle me-2"></i>{% trans "Need Help?" %}
+                    </h5>
+                    <p class="text-muted mb-3">
+                        {% trans "If you have any questions about your payment, please contact our support team." %}
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="mailto:support@abea.org" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-envelope me-2"></i>support@abea.org
+                        </a>
+                        <a href="tel:+260123456789" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-phone me-2"></i>+260 123 456 789
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Optional: Auto-refresh for pending status every 10 seconds (max 6 times)
+    {% if subscription.payment_status == 'PENDING' %}
+    let refreshCount = 0;
+    const maxRefreshes = 6;
+    const interval = setInterval(function() {
+        refreshCount++;
+        if (refreshCount <= maxRefreshes) {
+            location.reload();
+        } else {
+            clearInterval(interval);
+        }
+    }, 10000); // 10 seconds
+    {% endif %}
+</script>
+{% endblock %}

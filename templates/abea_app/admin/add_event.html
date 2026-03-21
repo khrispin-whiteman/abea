@@ -1,0 +1,495 @@
+<!-- templates/abea_app/admin/add_event.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Add Event" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>{% trans "Add New Event" %}</h4>
+                        <a href="{% url 'manage_events' %}" class="btn btn-sm" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3);">
+                            <i class="fas fa-arrow-left me-1"></i> {% trans "Back" %}
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Basic Information -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>{% trans "Basic Information" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="{{ form.title.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Event Title" %} *
+                                        </label>
+                                        {{ form.title }}
+                                        {% if form.title.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.title.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.event_type.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Event Type" %} *
+                                        </label>
+                                        {{ form.event_type }}
+                                        {% if form.event_type.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.event_type.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.slug.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "URL Slug" %} *
+                                        </label>
+                                        {{ form.slug }}
+                                        {% if form.slug.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.slug.errors }}</div>
+                                        {% endif %}
+                                        <small class="text-muted">{% trans "Used in the event URL. Use lowercase letters, numbers, and hyphens." %}</small>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label for="{{ form.short_description.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Short Description" %}
+                                        </label>
+                                        {{ form.short_description }}
+                                        <small class="text-muted">{% trans "Brief summary (max 300 characters)" %}</small>
+                                        {% if form.short_description.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.short_description.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label for="{{ form.description.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Full Description" %} *
+                                        </label>
+                                        {{ form.description }}
+                                        {% if form.description.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.description.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Date & Time -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>{% trans "Date & Time" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.start_date.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Start Date & Time" %} *
+                                        </label>
+                                        {{ form.start_date }}
+                                        {% if form.start_date.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.start_date.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.end_date.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "End Date & Time" %} *
+                                        </label>
+                                        {{ form.end_date }}
+                                        {% if form.end_date.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.end_date.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.registration_deadline.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Registration Deadline" %}
+                                        </label>
+                                        {{ form.registration_deadline }}
+                                        {% if form.registration_deadline.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.registration_deadline.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>{% trans "Location" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12 mb-3">
+                                        <div class="form-check form-switch">
+                                            {{ form.is_online }}
+                                            <label class="form-check-label" for="{{ form.is_online.id_for_label }}" style="color: var(--primary-green); font-weight: 500;">
+                                                {% trans "Online Event" %}
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.location.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Location" %}
+                                        </label>
+                                        {{ form.location }}
+                                        {% if form.location.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.location.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6" id="online-link-field">
+                                        <label for="{{ form.online_link.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Online Link" %}
+                                        </label>
+                                        {{ form.online_link }}
+                                        {% if form.online_link.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.online_link.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label for="{{ form.venue.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Venue Details" %}
+                                        </label>
+                                        {{ form.venue }}
+                                        <small class="text-muted">{% trans "Detailed venue information, directions, etc." %}</small>
+                                        {% if form.venue.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.venue.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Media -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-images me-2"></i>{% trans "Media" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.image.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Event Image" %}
+                                        </label>
+                                        {{ form.image }}
+                                        <small class="text-muted">{% trans "Recommended: 800x600px" %}</small>
+                                        {% if form.image.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.image.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.banner.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Event Banner" %}
+                                        </label>
+                                        {{ form.banner }}
+                                        <small class="text-muted">{% trans "Recommended: 1920x600px" %}</small>
+                                        {% if form.banner.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.banner.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Registration -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-users me-2"></i>{% trans "Registration" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12 mb-3">
+                                        <div class="form-check form-switch">
+                                            {{ form.is_free }}
+                                            <label class="form-check-label" for="{{ form.is_free.id_for_label }}" style="color: var(--primary-green); font-weight: 500;">
+                                                {% trans "Free Event" %}
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6" id="fee-field">
+                                        <label for="{{ form.fee.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Registration Fee" %}
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            {{ form.fee }}
+                                        </div>
+                                        {% if form.fee.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.fee.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.capacity.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Capacity" %}
+                                        </label>
+                                        {{ form.capacity }}
+                                        <small class="text-muted">{% trans "Leave empty for unlimited" %}</small>
+                                        {% if form.capacity.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.capacity.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEO & Status -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-search me-2"></i>{% trans "SEO & Status" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="{{ form.meta_description.id_for_label }}" class="form-label" style="color: var(--primary-green); font-weight: 500;">
+                                            {% trans "Meta Description" %}
+                                        </label>
+                                        {{ form.meta_description }}
+                                        <small class="text-muted">{% trans "For search engines (max 300 characters)" %}</small>
+                                        {% if form.meta_description.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.meta_description.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mb-3">
+                                            {{ form.is_published }}
+                                            <label class="form-check-label" for="{{ form.is_published.id_for_label }}" style="color: var(--primary-green); font-weight: 500;">
+                                                {% trans "Published" %}
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mb-3">
+                                            {{ form.is_featured }}
+                                            <label class="form-check-label" for="{{ form.is_featured.id_for_label }}" style="color: var(--primary-green); font-weight: 500;">
+                                                {% trans "Featured Event" %}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'manage_events' %}" class="btn" style="background: linear-gradient(135deg, #6c757d, #495057); border: none; color: white;">
+                                <i class="fas fa-times me-2"></i> {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                <i class="fas fa-save me-2"></i> {% trans "Create Event" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    /* Card polish */
+    .card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        border-bottom: none;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.75rem;
+    }
+
+    /* 🔥 Force Bootstrap styling on Django fields */
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+        width: 100%;
+        display: block;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.95rem;
+        transition: all 0.25s ease-in-out;
+        background-color: #fff;
+    }
+
+    input[type="file"] {
+        padding: 0.45rem;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.18);
+        outline: none;
+    }
+
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Switches */
+    .form-check.form-switch {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .form-check-input {
+        cursor: pointer;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        color: var(--primary-green);
+    }
+
+    /* Input groups */
+    .input-group-text {
+        background-color: var(--primary-green);
+        color: #fff;
+        border: 2px solid var(--primary-green);
+        border-right: none;
+        font-weight: 500;
+        border-radius: 8px 0 0 8px;
+    }
+
+    .input-group input {
+        border-radius: 0 8px 8px 0;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 0.7rem 1.6rem;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.25s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        h4, h5 {
+            font-size: 1.05rem;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle online link field
+        const isOnlineCheckbox = document.getElementById('{{ form.is_online.id_for_label }}');
+        const onlineLinkField = document.getElementById('online-link-field');
+        const locationField = document.getElementById('{{ form.location.id_for_label }}').closest('.col-md-6');
+
+        function toggleLocationFields() {
+            if (isOnlineCheckbox.checked) {
+                onlineLinkField.style.display = 'block';
+                locationField.style.display = 'none';
+            } else {
+                onlineLinkField.style.display = 'none';
+                locationField.style.display = 'block';
+            }
+        }
+
+        isOnlineCheckbox.addEventListener('change', toggleLocationFields);
+        toggleLocationFields();
+
+        // Toggle fee field
+        const isFreeCheckbox = document.getElementById('{{ form.is_free.id_for_label }}');
+        const feeField = document.getElementById('fee-field');
+
+        function toggleFeeField() {
+            if (isFreeCheckbox.checked) {
+                feeField.style.display = 'none';
+            } else {
+                feeField.style.display = 'block';
+            }
+        }
+
+        isFreeCheckbox.addEventListener('change', toggleFeeField);
+        toggleFeeField();
+
+        // Auto-generate slug from title
+        const titleField = document.getElementById('{{ form.title.id_for_label }}');
+        const slugField = document.getElementById('{{ form.slug.id_for_label }}');
+
+        titleField.addEventListener('blur', function() {
+            if (!slugField.value) {
+                const slug = titleField.value
+                    .toLowerCase()
+                    .replace(/[^\w\s]/gi, '')
+                    .replace(/\s+/g, '-');
+                slugField.value = slug;
+            }
+        });
+    });
+</script>
+{% endblock %}

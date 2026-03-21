@@ -1,0 +1,374 @@
+<!-- templates/abea_app/admin/manage_gallery.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Manage Gallery" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2 mb-0" style="color: var(--primary-green);">{% trans "Manage Gallery" %}</h1>
+            <a href="{% url 'add_gallery' %}" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                <i class="fas fa-plus me-2"></i> {% trans "Add Gallery Image" %}
+            </a>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="card mb-4">
+            <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                <h5 class="mb-0">{% trans "Filter Gallery" %}</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" name="search" class="form-control"
+                               placeholder="{% trans 'Search by title or description...' %}"
+                               value="{{ search_query }}">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="category" class="form-select">
+                            <option value="">{% trans "All Categories" %}</option>
+                            {% for cat_key, cat_name in categories %}
+                            <option value="{{ cat_key }}" {% if selected_category == cat_key %}selected{% endif %}>
+                                {{ cat_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="event" class="form-select">
+                            <option value="">{% trans "All Events" %}</option>
+                            {% for event in events %}
+                            <option value="{{ event.id }}" {% if request.GET.event == event.id|stringformat:"i" %}selected{% endif %}>
+                                {{ event.title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn w-100" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                            <i class="fas fa-filter me-1"></i> {% trans "Filter" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Gallery Table -->
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                <h5 class="mb-0">{% trans "Gallery Images" %}</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr style="background-color: rgba(46, 125, 50, 0.1);">
+                                <th style="color: var(--primary-green);">{% trans "Image" %}</th>
+                                <th style="color: var(--primary-green);">{% trans "Title" %}</th>
+                                <th style="color: var(--primary-green);">{% trans "Category" %}</th>
+                                <th style="color: var(--primary-green);">{% trans "Event" %}</th>
+                                <th style="color: var(--primary-green);">{% trans "Featured" %}</th>
+                                <th style="color: var(--primary-green);">{% trans "Uploaded" %}</th>
+                                <th style="color: var(--primary-green);">{% trans "Actions" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in gallery_items %}
+                            <tr>
+                                <td>
+                                    {% if item.thumbnail %}
+                                    <img src="{{ item.thumbnail.url }}" alt="{{ item.title }}"
+                                         class="rounded" style="width: 80px; height: 60px; object-fit: cover; border: 2px solid var(--primary-green);">
+                                    {% else %}
+                                    <img src="{{ item.image.url }}" alt="{{ item.title }}"
+                                         class="rounded" style="width: 80px; height: 60px; object-fit: cover; border: 2px solid var(--primary-green);">
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="fw-bold" style="color: var(--dark-gray);">{{ item.title|truncatewords:5 }}</div>
+                                    {% if item.description %}
+                                    <small class="text-muted">{{ item.description|truncatewords:3 }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                        {{ item.get_category_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if item.event %}
+                                    <span class="badge" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                        {{ item.event.title|truncatewords:2 }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted">{% trans "None" %}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.is_featured %}
+                                    <span class="badge" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); color: white;">
+                                        <i class="fas fa-star me-1"></i> {% trans "Featured" %}
+                                    </span>
+                                    {% else %}
+                                    <span class="badge" style="background: linear-gradient(135deg, #666, #333); color: white;">
+                                        {% trans "Standard" %}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ item.uploaded_at|date:"M d, Y" }}</small><br>
+                                    <small>{{ item.uploaded_by.get_full_name|default:item.uploaded_by.username }}</small>
+                                </td>
+                                <td>
+                                    <div class="gallery-actions d-flex gap-2">
+                                        <a href="{% url 'edit_gallery' item.id %}" class="btn btn-sm"
+                                           style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); border: none; color: white;"
+                                           title="{% trans 'Edit' %}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'delete_gallery' item.id %}" class="btn btn-sm"
+                                           style="background: linear-gradient(135deg, #666, #333); border: none; color: white;"
+                                           title="{% trans 'Delete' %}">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        <button class="btn btn-sm toggle-featured-btn"
+                                                style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); border: none; color: white;"
+                                                data-item-id="{{ item.id }}"
+                                                data-is-featured="{{ item.is_featured|yesno:'true,false' }}"
+                                                title="{% if item.is_featured %}{% trans 'Remove Featured' %}{% else %}{% trans 'Make Featured' %}{% endif %}">
+                                            <i class="fas {% if item.is_featured %}fa-star{% else %}fa-star-o{% endif %}"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-images fa-3x" style="color: var(--primary-green);"></i>
+                                    </div>
+                                    <h5 style="color: var(--primary-green);">{% trans "No gallery images found" %}</h5>
+                                    <p class="text-muted mb-4">
+                                        {% if search_query or selected_category %}
+                                        {% trans "Try changing your search criteria." %}
+                                        {% else %}
+                                        {% trans "Upload your first gallery image to get started." %}
+                                        {% endif %}
+                                    </p>
+                                    <a href="{% url 'add_gallery' %}" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                        <i class="fas fa-plus me-2"></i> {% trans "Add Gallery Image" %}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if gallery_items.has_other_pages %}
+                <nav aria-label="Gallery pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if gallery_items.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ gallery_items.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="color: var(--primary-green);">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for i in gallery_items.paginator.page_range %}
+                            {% if gallery_items.number == i %}
+                            <li class="page-item active">
+                                <span class="page-link" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border-color: var(--primary-green);">{{ i }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="color: var(--primary-green);">
+                                    {{ i }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if gallery_items.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ gallery_items.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="color: var(--primary-green);">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    .gallery-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        min-width: 36px;
+    }
+
+    .gallery-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .table th {
+        font-weight: 600;
+        border-top: 2px solid var(--primary-green);
+        border-bottom: 2px solid var(--primary-green);
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(46, 125, 50, 0.05);
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.4em 0.8em;
+        border-radius: 20px;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    }
+
+    .page-link {
+        color: var(--primary-green);
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .page-link:hover {
+        color: white;
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+    .page-item.active .page-link {
+        color: white;
+        border-color: var(--primary-green);
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Toggle featured status
+        document.querySelectorAll('.toggle-featured-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.dataset.itemId;
+                const isFeatured = this.dataset.isFeatured === 'true';
+
+                const confirmMessage = isFeatured
+                    ? "{% trans 'Are you sure you want to remove featured status from this image?' %}"
+                    : "{% trans 'Are you sure you want to make this image featured?' %}";
+
+                if (!confirm(confirmMessage)) {
+                    return;
+                }
+
+                fetch("{% url 'toggle_featured_gallery' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        gallery_id: itemId,
+                        action: 'toggle_featured'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                        alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; min-width: 300px; border-left: 4px solid var(--secondary-green);';
+                        alertDiv.innerHTML = `
+                            <i class="fas fa-check-circle me-2" style="color: var(--secondary-green);"></i>
+                            ${data.message || 'Action completed successfully!'}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
+                        document.body.appendChild(alertDiv);
+
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        alert(data.error || '{% trans "An error occurred" %}');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('{% trans "An error occurred while processing your request." %}');
+                });
+            });
+        });
+
+        // Add animation to table rows
+        const tableRows = document.querySelectorAll('.table tbody tr');
+        tableRows.forEach((row, index) => {
+            row.style.animationDelay = `${index * 0.05}s`;
+            row.classList.add('fade-in');
+        });
+    });
+</script>
+{% endblock %}

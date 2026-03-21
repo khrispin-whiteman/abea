@@ -1,0 +1,710 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Payment Pending" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+        --pending-orange: #f57c00;
+        --pending-light: #fff3e0;
+    }
+
+    .pending-animation {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .pending-icon {
+        font-size: 5rem;
+        color: var(--pending-orange);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .phone-simulation {
+        background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+        border-radius: 40px;
+        padding: 20px;
+        max-width: 300px;
+        margin: 0 auto;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .phone-screen {
+        background: #fff;
+        border-radius: 30px;
+        padding: 20px;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .phone-notch {
+        background: #000;
+        width: 60px;
+        height: 20px;
+        border-radius: 0 0 10px 10px;
+        margin: -20px auto 10px;
+    }
+
+    .phone-status-bar {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 10px;
+        color: #666;
+        font-size: 0.8rem;
+        margin-bottom: 20px;
+    }
+
+    .phone-time {
+        font-weight: bold;
+    }
+
+    .phone-battery {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .phone-battery-icon {
+        width: 20px;
+        height: 10px;
+        border: 1px solid #666;
+        border-radius: 2px;
+        position: relative;
+    }
+
+    .phone-battery-icon::after {
+        content: '';
+        position: absolute;
+        right: -3px;
+        top: 2px;
+        width: 2px;
+        height: 4px;
+        background: #666;
+        border-radius: 1px;
+    }
+
+    .phone-battery-level {
+        height: 8px;
+        width: 80%;
+        background: var(--primary-green);
+        margin: 1px;
+        border-radius: 1px;
+    }
+
+    .notification-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid var(--pending-orange);
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .notification-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .notification-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--pending-orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .notification-title {
+        font-weight: bold;
+        color: var(--dark-gray);
+    }
+
+    .notification-time {
+        font-size: 0.7rem;
+        color: #999;
+        margin-left: auto;
+    }
+
+    .notification-content {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .notification-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-approve {
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-approve:hover {
+        background: var(--secondary-green);
+        transform: translateY(-2px);
+    }
+
+    .btn-decline {
+        background: var(--light-gray);
+        color: var(--dark-gray);
+        border: 1px solid #ddd;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-decline:hover {
+        background: var(--accent-red);
+        color: white;
+        border-color: var(--accent-red);
+    }
+
+    .instruction-steps {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        margin-top: 2rem;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .step-item:last-child {
+        border-bottom: none;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .step-content {
+        flex-grow: 1;
+    }
+
+    .step-content h6 {
+        color: var(--dark-gray);
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .step-content p {
+        color: #666;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    .countdown-timer {
+        background: linear-gradient(135deg, var(--pending-orange), #ff9800);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .timer-display {
+        font-size: 2.5rem;
+        font-weight: 700;
+        font-family: monospace;
+        margin: 10px 0;
+    }
+
+    .btn-verify {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-verify:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+    }
+
+    .btn-verify:disabled {
+        background: var(--medium-gray);
+        transform: none;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+    .auto-refresh-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        background: rgba(33, 150, 243, 0.1);
+        border-radius: 20px;
+        color: #2196F3;
+        font-size: 0.8rem;
+    }
+
+    .refresh-spinner {
+        width: 12px;
+        height: 12px;
+        border: 2px solid #2196F3;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Display Django Messages -->
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Pending Payment Card -->
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--pending-orange), #ff9800); color: white;">
+                    <h4 class="mb-0">
+                        <i class="fas fa-hourglass-half me-2"></i>{% trans "Payment Pending" %}
+                    </h4>
+                    <p class="mb-0 mt-2 opacity-90">
+                        {% trans "Waiting for you to approve the payment on your phone" %}
+                    </p>
+                </div>
+
+                <div class="card-body">
+                    <!-- Transaction Details -->
+                    <div class="alert alert-info mb-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div>
+                                <strong>{% trans "Transaction ID:" %}</strong>
+                                <code class="ms-2">{{ transaction_id }}</code>
+                            </div>
+                            <div class="auto-refresh-indicator">
+                                <div class="refresh-spinner"></div>
+                                <span>{% trans "Auto-refreshing every 10 seconds" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Countdown Timer -->
+                    <div class="countdown-timer">
+                        <i class="fas fa-clock me-2"></i>
+                        <strong>{% trans "Time remaining to approve payment:" %}</strong>
+                        <div class="timer-display" id="countdown">05:00</div>
+                        <small>{% trans "Payment request will expire after 5 minutes" %}</small>
+                    </div>
+
+                    <div class="row">
+                        <!-- Phone Simulation Column -->
+                        <div class="col-md-6 mb-4">
+                            <h5 class="text-center mb-3">
+                                <i class="fas fa-mobile-alt me-2" style="color: var(--pending-orange);"></i>
+                                {% trans "Check Your Phone" %}
+                            </h5>
+
+                            <div class="phone-simulation">
+                                <div class="phone-screen">
+                                    <div class="phone-notch"></div>
+                                    <div class="phone-status-bar">
+                                        <span class="phone-time" id="currentTime"></span>
+                                        <div class="phone-battery">
+                                            <span>95%</span>
+                                            <div class="phone-battery-icon">
+                                                <div class="phone-battery-level"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="notification-card">
+                                        <div class="notification-header">
+                                            <div class="notification-icon">
+                                                <i class="fas fa-money-bill-wave"></i>
+                                            </div>
+                                            <span class="notification-title">{% trans "Mobile Money" %}</span>
+                                            <span class="notification-time">{% trans "Just now" %}</span>
+                                        </div>
+                                        <div class="notification-content">
+                                            <p class="mb-1">
+                                                <strong>{% trans "Payment Request" %}</strong>
+                                            </p>
+                                            <p class="mb-1">
+                                                {% trans "Amount:" %} {{ pending_transaction.amount|default:"1.00" }}
+                                            </p>
+                                            <p class="mb-1">
+                                                {% trans "To:" %} ABEA Membership
+                                            </p>
+                                            <p class="mb-0">
+                                                {% trans "Reference:" %} {{ transaction_id|slice:":8" }}
+                                            </p>
+                                        </div>
+                                        <div class="notification-actions">
+                                            <button class="btn-approve" disabled>
+                                                <i class="fas fa-check me-1"></i>{% trans "Approve" %}
+                                            </button>
+                                            <button class="btn-decline" disabled>
+                                                <i class="fas fa-times me-1"></i>{% trans "Decline" %}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center mt-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-arrow-up me-1"></i>
+                                            {% trans "Open your mobile money app to approve" %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Network Instructions -->
+                            <div class="mt-3">
+                                <div class="alert alert-warning mb-0">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>{% trans "Don't see the notification?" %}</strong>
+                                    <p class="mb-0 mt-2 small">
+                                        {% trans "Dial *170# and check your mobile money menu for pending payments." %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instructions Column -->
+                        <div class="col-md-6">
+                            <h5 class="text-center mb-3">
+                                <i class="fas fa-list me-2" style="color: var(--primary-green);"></i>
+                                {% trans "Next Steps" %}
+                            </h5>
+
+                            <div class="instruction-steps">
+                                <div class="step-item">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h6>{% trans "Check Your Phone" %}</h6>
+                                        <p>{% trans "Look for a payment notification from your mobile money provider" %}</p>
+                                    </div>
+                                </div>
+
+                                <div class="step-item">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h6>{% trans "Enter Your PIN" %}</h6>
+                                        <p>{% trans "Open the notification and enter your mobile money PIN to approve" %}</p>
+                                    </div>
+                                </div>
+
+                                <div class="step-item">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h6>{% trans "Wait for Confirmation" %}</h6>
+                                        <p>{% trans "You'll receive a confirmation SMS once the payment is complete" %}</p>
+                                    </div>
+                                </div>
+
+                                <div class="step-item">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h6>{% trans "Verify Payment" %}</h6>
+                                        <p>{% trans "Click the verify button below or wait for auto-verification" %}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Tips -->
+                            <div class="card mt-4" style="background: rgba(251, 188, 4, 0.05);">
+                                <div class="card-body">
+                                    <h6 class="mb-3" style="color: var(--pending-orange);">
+                                        <i class="fas fa-lightbulb me-2"></i>
+                                        {% trans "Quick Tips" %}
+                                    </h6>
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2">
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            {% trans "Make sure you have sufficient balance in your mobile money account" %}
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            {% trans "Check your network connection if you don't receive the notification" %}
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            {% trans "The payment request expires in 5 minutes" %}
+                                        </li>
+                                        <li>
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            {% trans "You can safely close this page and return later to verify" %}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-4">
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'verify_payment' transaction_id %}"
+                               class="btn btn-verify"
+                               id="verifyButton">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                {% trans "I've Approved the Payment - Verify Now" %}
+                            </a>
+                        </div>
+
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                {% trans "Page will automatically refresh every 10 seconds to check payment status" %}
+                            </small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'membership' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>{% trans "Back to Membership Plans" %}
+                            </a>
+                            <a href="{% url 'contact' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-headset me-2"></i>{% trans "Need Help?" %}
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if message %}
+                    <div class="alert alert-info mt-4 mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {{ message }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Support Information -->
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h5 style="color: var(--primary-green);">
+                        <i class="fas fa-headset me-2"></i>{% trans "Having Trouble?" %}
+                    </h5>
+                    <p class="text-muted mb-3">
+                        {% trans "Our support team is here to help you with the payment process." %}
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="mailto:support@abea.org" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-envelope me-2"></i>support@abea.org
+                        </a>
+                        <a href="tel:+260123456789" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-phone me-2"></i>+260 123 456 789
+                        </a>
+                        <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-comments me-2"></i>{% trans "Contact Form" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update current time in phone simulation
+    function updateCurrentTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('currentTime').textContent = timeString;
+    }
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+
+    // Countdown timer (5 minutes = 300 seconds)
+    let timeLeft = 300; // 5 minutes in seconds
+    const countdownElement = document.getElementById('countdown');
+    const verifyButton = document.getElementById('verifyButton');
+
+    function updateCountdown() {
+        if (timeLeft <= 0) {
+            countdownElement.textContent = '00:00';
+            countdownElement.style.color = '#d32f2f';
+            verifyButton.disabled = true;
+            verifyButton.classList.add('disabled');
+            verifyButton.innerHTML = '<i class="fas fa-clock me-2"></i>{% trans "Payment Request Expired" %}';
+
+            // Show expired message
+            const expiredAlert = document.createElement('div');
+            expiredAlert.className = 'alert alert-danger mt-3';
+            expiredAlert.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong>{% trans "Payment request expired." %}</strong>
+                {% trans "Please try again with a new payment." %}
+                <div class="mt-2">
+                    <a href="{% url 'membership' %}" class="btn btn-outline-danger btn-sm">
+                        {% trans "Back to Plans" %}
+                    </a>
+                </div>
+            `;
+            document.querySelector('.text-center.mt-4').appendChild(expiredAlert);
+            return;
+        }
+
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        // Change color when less than 1 minute remains
+        if (timeLeft < 60) {
+            countdownElement.style.color = '#ff9800';
+        }
+
+        timeLeft--;
+    }
+
+    // Update countdown every second
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // Auto-refresh page every 10 seconds to check payment status
+    let refreshCount = 0;
+    const refreshInterval = setInterval(function() {
+        refreshCount++;
+
+        // Update refresh indicator
+        const refreshIndicator = document.querySelector('.auto-refresh-indicator span');
+        if (refreshIndicator) {
+            refreshIndicator.textContent = `{% trans "Checking status..." %} (${refreshCount})`;
+        }
+
+        // Check if we should redirect (if payment is complete, the view will handle it)
+        // We'll just reload the page and let the backend handle the redirect
+        if (refreshCount % 3 === 0) { // Every 30 seconds (3 * 10s)
+            window.location.reload();
+        }
+    }, 10000); // 10 seconds
+
+    // Stop auto-refresh after 5 minutes
+    setTimeout(function() {
+        clearInterval(refreshInterval);
+        const refreshIndicator = document.querySelector('.auto-refresh-indicator');
+        if (refreshIndicator) {
+            refreshIndicator.innerHTML = '<span class="text-danger">{% trans "Auto-refresh stopped" %}</span>';
+        }
+    }, 300000); // 5 minutes
+
+    // Handle verify button click
+    verifyButton.addEventListener('click', function(e) {
+        // Show loading state
+        const originalText = verifyButton.innerHTML;
+        verifyButton.disabled = true;
+        verifyButton.innerHTML = '<div class="refresh-spinner" style="margin-right: 8px; display: inline-block;"></div> {% trans "Verifying..." %}';
+
+        // The link will navigate normally, but we'll add a small delay to show loading
+        e.preventDefault();
+        setTimeout(function() {
+            window.location.href = verifyButton.href;
+        }, 500);
+    });
+
+    // Add keyboard shortcut (press 'V' to verify)
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'v' || e.key === 'V') {
+            e.preventDefault();
+            if (!verifyButton.disabled) {
+                verifyButton.click();
+            }
+        }
+    });
+
+    // Show tooltip for keyboard shortcut
+    const verifyButtonWrapper = document.createElement('small');
+    verifyButtonWrapper.className = 'text-muted d-block mt-2';
+    verifyButtonWrapper.innerHTML = '<i class="fas fa-keyboard me-1"></i>{% trans "Press 'V' to verify" %}';
+    verifyButton.parentNode.appendChild(verifyButtonWrapper);
+
+    // Handle browser back/forward cache
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+});
+</script>
+{% endblock %}

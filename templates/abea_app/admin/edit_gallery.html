@@ -1,0 +1,348 @@
+<!-- templates/abea_app/admin/edit_gallery.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Edit Gallery Image" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2 mb-0" style="color: var(--primary-green);">{% trans "Edit Gallery Image" %}</h1>
+                <a href="{% url 'manage_gallery' %}" class="btn" style="background: linear-gradient(135deg, #666, #333); border: none; color: white;">
+                    <i class="fas fa-arrow-left me-2"></i> {% trans "Back to Gallery" %}
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                    <h5 class="mb-0">{% trans "Edit Image Details" %}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="row g-4">
+                        {% csrf_token %}
+
+                        <div class="col-md-8">
+                            <div class="row g-4">
+                                <!-- Title -->
+                                <div class="col-12">
+                                    <label for="id_title" class="form-label" style="color: var(--primary-green); font-weight: 600;">
+                                        {% trans "Title" %} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ form.title.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Description -->
+                                <div class="col-12">
+                                    <label for="id_description" class="form-label" style="color: var(--primary-green); font-weight: 600;">
+                                        {% trans "Description" %}
+                                    </label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ form.description.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="id_category" class="form-label" style="color: var(--primary-green); font-weight: 600;">
+                                        {% trans "Category" %} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ form.category.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="id_event" class="form-label" style="color: var(--primary-green); font-weight: 600;">
+                                        {% trans "Associated Event" %}
+                                    </label>
+                                    {{ form.event }}
+                                    {% if form.event.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ form.event.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="id_display_order" class="form-label" style="color: var(--primary-green); font-weight: 600;">
+                                        {% trans "Display Order" %}
+                                    </label>
+                                    {{ form.display_order }}
+                                    <small class="text-muted">{% trans "Lower numbers display first" %}</small>
+                                    {% if form.display_order.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ form.display_order.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-check mt-4 pt-2">
+                                        {{ form.is_featured }}
+                                        <label class="form-check-label" for="id_is_featured" style="color: var(--primary-green); font-weight: 600;">
+                                            {% trans "Featured Image" %}
+                                        </label>
+                                        <small class="d-block text-muted">{% trans "Featured images are highlighted on the gallery page" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card border-0" style="background: rgba(46, 125, 50, 0.05);">
+                                <div class="card-body">
+                                    <h6 class="mb-3" style="color: var(--primary-green); font-weight: 600;">
+                                        <i class="fas fa-image me-2"></i>{% trans "Current Images" %}
+                                    </h6>
+
+                                    <!-- Current Main Image -->
+                                    <div class="mb-4">
+                                        <label class="form-label" style="color: var(--primary-green); font-weight: 600;">
+                                            {% trans "Current Main Image" %}
+                                        </label>
+                                        <div class="text-center mb-2">
+                                            <img src="{{ gallery_item.image.url }}" alt="Current Image"
+                                                 class="img-fluid rounded" style="max-height: 150px; border: 3px solid var(--primary-green);">
+                                        </div>
+                                        <label for="id_image" class="form-label" style="color: var(--primary-green); font-weight: 600;">
+                                            {% trans "Replace Image" %}
+                                        </label>
+                                        {{ form.image }}
+                                        {% if form.image.errors %}
+                                        <div class="text-danger mt-1">
+                                            {{ form.image.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Current Thumbnail -->
+                                    <div>
+                                        <label class="form-label" style="color: var(--primary-green); font-weight: 600;">
+                                            {% trans "Current Thumbnail" %}
+                                        </label>
+                                        <div class="text-center mb-2">
+                                            {% if gallery_item.thumbnail %}
+                                            <img src="{{ gallery_item.thumbnail.url }}" alt="Current Thumbnail"
+                                                 class="img-fluid rounded" style="max-height: 100px; border: 3px solid var(--secondary-green);">
+                                            {% else %}
+                                            <div class="text-muted py-3" style="border: 2px dashed #ccc; border-radius: 8px;">
+                                                <i class="fas fa-image fa-2x mb-2"></i>
+                                                <p class="mb-0">{% trans "No thumbnail set" %}</p>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <label for="id_thumbnail" class="form-label" style="color: var(--primary-green); font-weight: 600;">
+                                            {% trans "Replace Thumbnail" %}
+                                        </label>
+                                        {{ form.thumbnail }}
+                                        {% if form.thumbnail.errors %}
+                                        <div class="text-danger mt-1">
+                                            {{ form.thumbnail.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Image Info -->
+                                    <div class="mt-4 pt-3 border-top">
+                                        <small class="text-muted d-block">
+                                            <i class="fas fa-info-circle me-1" style="color: var(--primary-green);"></i>
+                                            {% trans "Uploaded by:" %} {{ gallery_item.uploaded_by.get_full_name|default:gallery_item.uploaded_by.username }}
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1" style="color: var(--primary-green);"></i>
+                                            {% trans "Uploaded on:" %} {{ gallery_item.uploaded_at|date:"M d, Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end gap-3">
+                                <a href="{% url 'manage_gallery' %}" class="btn" style="background: linear-gradient(135deg, #666, #333); border: none; color: white;">
+                                    <i class="fas fa-times me-2"></i> {% trans "Cancel" %}
+                                </a>
+                                <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                    <i class="fas fa-save me-2"></i> {% trans "Update Gallery Image" %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --primary-green: #2e7d32;
+    --secondary-green: #4caf50;
+    --accent-red: #d32f2f;
+    --dark-red: #b71c1c;
+    --light-gray: #f5f5f5;
+}
+
+/* =========================
+   BASE INPUT STYLING
+========================= */
+input,
+select,
+textarea {
+    width: 100%;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+    background-color: #fff;
+}
+
+/* Textarea */
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Focus */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+    outline: none;
+}
+
+/* Disabled */
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background-color: var(--light-gray);
+    cursor: not-allowed;
+}
+
+/* =========================
+   FILE INPUTS
+========================= */
+input[type="file"] {
+    padding: 0.5rem;
+    background: #fafafa;
+    border-style: dashed;
+    cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+    background: linear-gradient(135deg, var(--primary-green), var(--dark-red));
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin-right: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+    opacity: 0.9;
+}
+
+/* =========================
+   CHECKBOXES
+========================= */
+.form-check-input {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 4px;
+    border: 2px solid #ccc;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+}
+
+/* =========================
+   ERROR STATES
+========================= */
+input.is-invalid,
+select.is-invalid,
+textarea.is-invalid {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 0 0.2rem rgba(211, 47, 47, 0.25);
+}
+
+/* Django error lists */
+.text-danger ul {
+    padding-left: 1rem;
+    margin-bottom: 0;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
+/* =========================
+   LABELS
+========================= */
+label.form-label {
+    margin-bottom: 0.4rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Text inputs & textareas
+    document.querySelectorAll(
+        'input[type="text"], input[type="email"], input[type="number"], input[type="url"], input[type="date"], textarea'
+    ).forEach(el => {
+        el.classList.add('form-control');
+    });
+
+    // Selects
+    document.querySelectorAll('select').forEach(el => {
+        el.classList.add('form-select');
+    });
+
+    // File inputs
+    document.querySelectorAll('input[type="file"]').forEach(el => {
+        el.classList.add('form-control');
+    });
+
+});
+</script>
+{% endblock %}

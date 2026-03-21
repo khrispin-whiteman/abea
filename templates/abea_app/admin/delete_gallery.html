@@ -1,0 +1,178 @@
+<!-- templates/abea_app/admin/delete_gallery.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete Gallery Image" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2 mb-0" style="color: var(--accent-red);">{% trans "Delete Gallery Image" %}</h1>
+                <a href="{% url 'manage_gallery' %}" class="btn" style="background: linear-gradient(135deg, #666, #333); border: none; color: white;">
+                    <i class="fas fa-arrow-left me-2"></i> {% trans "Back to Gallery" %}
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-center" style="background: linear-gradient(135deg, var(--accent-red), var(--dark-red)); color: white;">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {% trans "Confirm Deletion" %}
+                    </h4>
+                </div>
+
+                <div class="card-body text-center py-5">
+                    <!-- Warning Icon -->
+                    <div class="mb-4">
+                        <div class="warning-icon mx-auto" style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--accent-red), var(--dark-red)); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-trash-alt fa-3x" style="color: white;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Image Preview -->
+                    <div class="mb-4">
+                        {% if gallery_item.thumbnail %}
+                        <img src="{{ gallery_item.thumbnail.url }}" alt="{{ gallery_item.title }}"
+                             class="img-fluid rounded" style="max-height: 200px; border: 3px solid var(--accent-red);">
+                        {% else %}
+                        <img src="{{ gallery_item.image.url }}" alt="{{ gallery_item.title }}"
+                             class="img-fluid rounded" style="max-height: 200px; border: 3px solid var(--accent-red);">
+                        {% endif %}
+                    </div>
+
+                    <!-- Confirmation Message -->
+                    <h4 class="mb-3" style="color: var(--dark-red);">
+                        {% trans "Are you sure you want to delete this image?" %}
+                    </h4>
+
+                    <p class="text-muted mb-4">
+                        {% trans "This action cannot be undone. The following image will be permanently deleted:" %}
+                    </p>
+
+                    <!-- Gallery Details -->
+                    <div class="alert alert-warning border-0 mb-4" style="background-color: rgba(211, 47, 47, 0.1); border-left: 4px solid var(--accent-red);">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-image me-3" style="color: var(--accent-red); font-size: 1.5rem;"></i>
+                            <div class="text-start">
+                                <h5 class="mb-1" style="color: var(--dark-red);">{{ gallery_item.title }}</h5>
+                                <p class="mb-1">
+                                    <span class="badge me-2" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                                        {{ gallery_item.get_category_display }}
+                                    </span>
+                                    {% if gallery_item.is_featured %}
+                                    <span class="badge" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); color: white;">
+                                        <i class="fas fa-star me-1"></i>{% trans "Featured" %}
+                                    </span>
+                                    {% endif %}
+                                </p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {% trans "Uploaded:" %} {{ gallery_item.uploaded_at|date:"M d, Y" }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deletion Impact -->
+                    <div class="card mb-4 border-warning">
+                        <div class="card-body">
+                            <h6 class="mb-3" style="color: var(--accent-red);">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {% trans "What will be deleted:" %}
+                            </h6>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-check-circle me-3" style="color: var(--accent-red);"></i>
+                                    {% trans "Main image file from storage" %}
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-check-circle me-3" style="color: var(--accent-red);"></i>
+                                    {% trans "Thumbnail file (if exists)" %}
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-check-circle me-3" style="color: var(--accent-red);"></i>
+                                    {% trans "All database records related to this image" %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'manage_gallery' %}" class="btn btn-lg"
+                               style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); border: none; color: white; min-width: 150px;">
+                                <i class="fas fa-times me-2"></i> {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-lg"
+                                    style="background: linear-gradient(135deg, var(--accent-red), var(--dark-red)); border: none; color: white; min-width: 150px;">
+                                <i class="fas fa-trash-alt me-2"></i> {% trans "Delete" %}
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Extra Warning -->
+                    <div class="mt-4 pt-3 border-top">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1" style="color: var(--accent-red);"></i>
+                            {% trans "This action requires administrator privileges and is irreversible." %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+    }
+
+    .warning-icon {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .btn {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 0.75rem 0;
+        background: transparent;
+    }
+
+    .alert-warning {
+        border-radius: 8px;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

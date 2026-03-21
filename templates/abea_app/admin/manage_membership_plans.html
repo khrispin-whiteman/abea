@@ -1,0 +1,337 @@
+<!-- templates/abea_app/admin/manage_membership_plans.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Manage Membership Plans" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 mb-0" style="color: var(--primary-green);">
+            <i class="fas fa-users me-2"></i>{% trans "Manage Membership Plans" %}
+        </h1>
+        <a href="{% url 'add_membership_plan' %}" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+            <i class="fas fa-plus me-2"></i> {% trans "Add Plan" %}
+        </a>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+            <h5 class="mb-0">{% trans "Filter Plans" %}</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control"
+                           placeholder="{% trans 'Search by name...' %}"
+                           value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="plan_type" class="form-select">
+                        <option value="">{% trans "All Types" %}</option>
+                        {% for type_key, type_name in plan_type_choices %}
+                        <option value="{{ type_key }}" {% if selected_type == type_key %}selected{% endif %}>
+                            {{ type_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">{% trans "All Status" %}</option>
+                        <option value="active" {% if selected_status == 'active' %}selected{% endif %}>
+                            {% trans "Active" %}
+                        </option>
+                        <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>
+                            {% trans "Inactive" %}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn w-100" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                        <i class="fas fa-filter me-1"></i> {% trans "Filter" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Plans Table -->
+    <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{% trans "Membership Plans" %}</h5>
+                <span class="badge" style="background: rgba(255,255,255,0.2);">
+                    {{ plans.count }} {% trans "plans" %}
+                </span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr style="background-color: rgba(46, 125, 50, 0.1);">
+                            <th style="color: var(--primary-green);">{% trans "Plan Name" %}</th>
+                            <th style="color: var(--primary-green);">{% trans "Type" %}</th>
+                            <th style="color: var(--primary-green);">{% trans "Price" %}</th>
+                            <th style="color: var(--primary-green);">{% trans "Duration" %}</th>
+                            <th style="color: var(--primary-green);">{% trans "Status" %}</th>
+                            <th style="color: var(--primary-green);">{% trans "Features" %}</th>
+                            <th style="color: var(--primary-green);">{% trans "Display Order" %}</th>
+                            <th style="color: var(--primary-green);">{% trans "Actions" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plan in plans %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold" style="color: var(--dark-gray);">{{ plan.name }}</div>
+                                {% if plan.is_popular %}
+                                <span class="badge mt-1" style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800); color: #333;">
+                                    <i class="fas fa-star me-1"></i>{% trans "Popular" %}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                    {{ plan.get_plan_type_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="fw-bold" style="color: var(--primary-green);">
+                                    {{ plan.currency }} {{ plan.price }}
+                                </div>
+                                <small class="text-muted">{% trans "per year" %}</small>
+                            </td>
+                            <td>
+                                {{ plan.duration_months }} {% trans "months" %}
+                            </td>
+                            <td>
+                                {% if plan.is_active %}
+                                <span class="badge" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">{% trans "Active" %}</span>
+                                {% else %}
+                                <span class="badge" style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); color: white;">{% trans "Inactive" %}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ plan.features|length }} {% trans "features" %}</small>
+                                <div class="text-muted small">
+                                    {{ plan.description|truncatewords:10 }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" style="background: var(--medium-gray); color: white;">
+                                    {{ plan.display_order }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'edit_membership_plan' plan.id %}" class="btn btn-sm"
+                                       style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); border: none; color: white;"
+                                       title="{% trans 'Edit' %}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-sm toggle-plan-active-btn"
+                                            style="background: linear-gradient(135deg, var(--accent-yellow), #e6a800); border: none; color: #333;"
+                                            data-plan-id="{{ plan.id }}"
+                                            data-is-active="{{ plan.is_active|yesno:'true,false' }}"
+                                            title="{% if plan.is_active %}{% trans 'Deactivate' %}{% else %}{% trans 'Activate' %}{% endif %}">
+                                        <i class="fas {% if plan.is_active %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>
+                                    </button>
+                                    <button class="btn btn-sm toggle-plan-popular-btn"
+                                            style="background: linear-gradient(135deg, #6c757d, #495057); border: none; color: white;"
+                                            data-plan-id="{{ plan.id }}"
+                                            data-is-popular="{{ plan.is_popular|yesno:'true,false' }}"
+                                            title="{% if plan.is_popular %}{% trans 'Remove Popular' %}{% else %}{% trans 'Make Popular' %}{% endif %}">
+                                        <i class="fas {% if plan.is_popular %}fa-star{% else %}fa-star-o{% endif %}"></i>
+                                    </button>
+                                    <a href="{% url 'delete_membership_plan' plan.id %}" class="btn btn-sm"
+                                       style="background: linear-gradient(135deg, var(--accent-red), #d32f2f); border: none; color: white;"
+                                       title="{% trans 'Delete' %}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-users fa-3x" style="color: var(--primary-green);"></i>
+                                </div>
+                                <h5 style="color: var(--primary-green);">{% trans "No membership plans found" %}</h5>
+                                <p class="text-muted mb-4">
+                                    {% if search_query or selected_type or selected_status %}
+                                    {% trans "Try changing your filter criteria." %}
+                                    {% else %}
+                                    {% trans "Create your first membership plan to get started." %}
+                                    {% endif %}
+                                </p>
+                                <a href="{% url 'add_membership_plan' %}" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                    <i class="fas fa-plus me-2"></i> {% trans "Add Plan" %}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    .btn {
+        padding: 0.375rem 0.75rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 6px;
+        min-width: 36px;
+    }
+
+    .table th {
+        font-weight: 600;
+        border-top: 2px solid var(--primary-green);
+        border-bottom: 2px solid var(--primary-green);
+        padding: 1rem 0.75rem;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(46, 125, 50, 0.05);
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.4em 0.8em;
+        border-radius: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Toggle plan active status
+        document.querySelectorAll('.toggle-plan-active-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const planId = this.dataset.planId;
+                const isActive = this.dataset.isActive === 'true';
+
+                if (confirm(isActive
+                    ? "{% trans 'Are you sure you want to deactivate this plan? Users will not be able to subscribe to it.' %}"
+                    : "{% trans 'Are you sure you want to activate this plan?' %}")) {
+
+                    fetch("{% url 'toggle_plan_active' 999 %}".replace('999', planId), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success message
+                            const alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                            alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; min-width: 300px; border-left: 4px solid var(--secondary-green);';
+                            alertDiv.innerHTML = `
+                                <i class="fas fa-check-circle me-2" style="color: var(--secondary-green);"></i>
+                                ${data.message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            `;
+                            document.body.appendChild(alertDiv);
+
+                            // Reload after a short delay
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            alert(data.error || '{% trans "An error occurred" %}');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('{% trans "An error occurred while processing your request." %}');
+                    });
+                }
+            });
+        });
+
+        // Toggle plan popular status
+        document.querySelectorAll('.toggle-plan-popular-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const planId = this.dataset.planId;
+                const isPopular = this.dataset.isPopular === 'true';
+
+                fetch("{% url 'toggle_plan_popular' 999 %}".replace('999', planId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                        alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; min-width: 300px; border-left: 4px solid var(--secondary-green);';
+                        alertDiv.innerHTML = `
+                            <i class="fas fa-check-circle me-2" style="color: var(--secondary-green);"></i>
+                            ${data.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
+                        document.body.appendChild(alertDiv);
+
+                        // Reload after a short delay
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        alert(data.error || '{% trans "An error occurred" %}');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('{% trans "An error occurred while processing your request." %}');
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

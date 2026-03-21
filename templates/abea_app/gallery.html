@@ -1,0 +1,895 @@
+<!-- templates/abea_app/gallery.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+    }
+
+    /* Gallery Hero Section */
+    .gallery-hero {
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-gray) 100%);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    /* Gallery Card Styling */
+    .gallery-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+        position: relative;
+    }
+
+    .gallery-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Fixed image container for uniformity */
+    .gallery-img-container {
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .gallery-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .gallery-card:hover .gallery-img-container img {
+        transform: scale(1.1);
+    }
+
+    /* Overlay for image actions */
+    .gallery-img-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .gallery-card:hover .gallery-img-overlay {
+        opacity: 1;
+    }
+
+    .gallery-action-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 5px;
+        color: var(--primary-green);
+        transition: all 0.3s ease;
+    }
+
+    .gallery-action-btn:hover {
+        background: white;
+        transform: scale(1.1);
+        color: var(--accent-red);
+    }
+
+    /* Badges */
+    .gallery-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 2;
+    }
+
+    .featured-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 2;
+    }
+
+    /* Section Title */
+    .section-title {
+        position: relative;
+        margin-bottom: 3rem;
+        padding-bottom: 1rem;
+        color: var(--primary-green);
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--accent-red));
+        border-radius: 2px;
+    }
+
+    /* Filter Section */
+    .category-filter {
+        background-color: var(--light-gray);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .category-filter .nav-link {
+        color: var(--medium-gray);
+        font-weight: 500;
+        padding: 0.5rem 1.5rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        margin: 0 5px;
+    }
+
+    .category-filter .nav-link.active {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+    }
+
+    .category-filter .nav-link:hover:not(.active) {
+        color: var(--primary-green);
+        background-color: rgba(46, 125, 50, 0.1);
+    }
+
+    /* Lightbox Modal */
+    .lightbox-modal .modal-dialog {
+        max-width: 90%;
+        height: 90vh;
+        margin: auto;
+    }
+
+    .lightbox-modal .modal-content {
+        background: transparent;
+        border: none;
+        height: 100%;
+    }
+
+    .lightbox-modal .modal-body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        height: 100%;
+    }
+
+    .lightbox-img-container {
+        max-height: 80vh;
+        max-width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .lightbox-img {
+        max-height: 80vh;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 10px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Lightbox Navigation */
+    .lightbox-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-green);
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .lightbox-nav:hover {
+        background: white;
+        color: var(--accent-red);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .lightbox-nav.prev {
+        left: 20px;
+    }
+
+    .lightbox-nav.next {
+        right: 20px;
+    }
+
+    .lightbox-nav:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+
+    .lightbox-nav:disabled:hover {
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--primary-green);
+        transform: translateY(-50%);
+    }
+
+    /* Lightbox Header */
+    .lightbox-header {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 10px;
+        padding: 15px;
+        color: white;
+        z-index: 10;
+    }
+
+    .lightbox-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    /* Lightbox Actions */
+    .lightbox-actions {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 10;
+    }
+
+    .lightbox-action-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 10px;
+        color: var(--primary-green);
+        transition: all 0.3s ease;
+    }
+
+    .lightbox-action-btn:hover {
+        background: white;
+        color: var(--accent-red);
+        transform: scale(1.1);
+    }
+
+    /* Lightbox Footer */
+    .lightbox-footer {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 10px;
+        padding: 15px;
+        color: white;
+        z-index: 10;
+    }
+
+    .lightbox-description {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .lightbox-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        opacity: 0.8;
+    }
+
+    /* Pagination */
+    .gallery-pagination .page-link {
+        color: var(--primary-green);
+        border: 1px solid #dee2e6;
+    }
+
+    .gallery-pagination .page-item.active .page-link {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+        color: white;
+    }
+
+    /* Statistics Cards */
+    .stat-card {
+        text-align: center;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        background: white;
+        border-top: 4px solid var(--primary-green);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        background: linear-gradient(135deg, var(--primary-green), var(--accent-red));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        color: var(--medium-gray);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* No Images Message */
+    .no-images-container {
+        text-align: center;
+        padding: 60px 0;
+    }
+
+    .no-images-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+
+    .no-images-icon i {
+        font-size: 3rem;
+        color: white;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .gallery-img-container {
+            height: 180px;
+        }
+
+        .lightbox-nav {
+            width: 40px;
+            height: 40px;
+        }
+
+        .lightbox-nav.prev {
+            left: 10px;
+        }
+
+        .lightbox-nav.next {
+            right: 10px;
+        }
+
+        .lightbox-header,
+        .lightbox-footer {
+            left: 10px;
+            right: 10px;
+        }
+
+        .category-filter .nav-link {
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            margin: 3px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .gallery-img-container {
+            height: 150px;
+        }
+
+        .gallery-hero {
+            padding: 60px 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Gallery Hero Section -->
+<section class="gallery-hero">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-4">{% trans "Our Gallery" %}</h1>
+        <p class="lead mb-0">
+            {% trans "Explore moments from our events, conferences, workshops, and activities across Africa." %}
+        </p>
+    </div>
+</section>
+
+<!-- Category Filter -->
+<section class="py-4 category-filter">
+    <div class="container">
+        <div class="type-filter">
+            <ul class="nav justify-content-center flex-wrap">
+                <li class="nav-item">
+                    <a class="nav-link {% if not selected_category %}active{% endif %}"
+                       href="{% url 'gallery' %}">
+                        <i class="fas fa-th me-2"></i>{% trans "All Images" %}
+                    </a>
+                </li>
+                {% for category_key, category_label in categories %}
+                <li class="nav-item">
+                    <a class="nav-link {% if selected_category == category_key %}active{% endif %}"
+                       href="{% url 'gallery' %}?category={{ category_key }}">
+                        <i class="fas fa-{{ category_key|lower }} me-2"></i>{{ category_label }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if selected_category %}
+        <div class="mt-4 text-center">
+            <p class="text-muted mb-0">
+                <i class="fas fa-filter me-2"></i>
+                {% trans "Showing" %} {{ images.paginator.count }}
+                {% trans "images in" %} "{{ selected_category|title }}" {% trans "category" %}
+                <a href="{% url 'gallery' %}" class="text-decoration-none ms-2">
+                    <i class="fas fa-times"></i> {% trans "Clear filter" %}
+                </a>
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Gallery Grid -->
+<section class="py-5">
+    <div class="container">
+        {% if images %}
+        <div class="row g-4">
+            {% for image in images %}
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="gallery-card" data-id="{{ image.id }}" data-index="{{ forloop.counter0 }}"
+                     data-title="{{ image.title }}" data-description="{{ image.description }}"
+                     data-category="{{ image.get_category_display }}" data-date="{{ image.uploaded_at|date:'F d, Y' }}"
+                     {% if image.event %}data-event="{{ image.event.title }}"{% endif %}
+                     {% if image.image %}data-image-url="{{ image.image.url }}"{% endif %}
+                     {% if image.thumbnail %}data-thumbnail-url="{{ image.thumbnail.url }}"{% endif %}>
+
+                    <!-- Image Container -->
+                    <div class="gallery-img-container">
+                        {% if image.thumbnail %}
+                        <img src="{{ image.thumbnail.url }}" class="card-img-top" alt="{{ image.title }}">
+                        {% else %}
+                        <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.title }}">
+                        {% endif %}
+
+                        <!-- Category Badge -->
+                        <span class="gallery-badge badge"
+                              style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                            {{ image.get_category_display }}
+                        </span>
+
+                        <!-- Featured Badge -->
+                        {% if image.is_featured %}
+                        <span class="featured-badge badge" style="background: linear-gradient(135deg, var(--accent-red), #c62828);">
+                            <i class="fas fa-star me-1"></i>{% trans "Featured" %}
+                        </span>
+                        {% endif %}
+
+                        <!-- Action Overlay -->
+                        <div class="gallery-img-overlay">
+                            <button class="gallery-action-btn view-btn" data-bs-toggle="modal" data-bs-target="#lightboxModal">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            {% if image.image %}
+                            <a href="{{ image.image.url }}" class="gallery-action-btn" download>
+                                <i class="fas fa-download"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-4">
+                        <h6 class="card-title fw-bold mb-2">{{ image.title|truncatechars:40 }}</h6>
+
+                        {% if image.description %}
+                        <p class="card-text text-muted small mb-3">
+                            {{ image.description|truncatechars:60 }}
+                        </p>
+                        {% endif %}
+
+                        <!-- Event Link -->
+                        {% if image.event %}
+                        <div class="mb-3">
+                            <a href="{% url 'event_detail' image.event.slug %}" class="text-decoration-none small">
+                                <i class="fas fa-calendar-alt me-1" style="color: var(--accent-red);"></i>
+                                {{ image.event.title|truncatechars:30 }}
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        <!-- Card Footer -->
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <small class="text-muted">
+                                <i class="far fa-calendar me-1"></i>
+                                {{ image.uploaded_at|date:"M d, Y" }}
+                            </small>
+                            <small class="text-muted">
+                                {% if image.uploaded_by %}
+                                <i class="fas fa-user me-1"></i>
+                                {{ image.uploaded_by.get_short_name|default:image.uploaded_by.username }}
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if images.has_other_pages %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center gallery-pagination">
+                        {% if images.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ images.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                <i class="fas fa-chevron-left"></i> {% trans "Previous" %}
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in images.paginator.page_range %}
+                            {% if images.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > images.number|add:'-3' and num < images.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if selected_category %}&category={{ selected_category }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if images.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ images.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                {% trans "Next" %} <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+                <p class="text-center text-muted mt-2">
+                    {% trans "Page" %} {{ images.number }} {% trans "of" %} {{ images.paginator.num_pages }}
+                    ({{ images.paginator.count }} {% trans "total images" %})
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- No Images Message -->
+        <div class="no-images-container">
+            <div class="no-images-icon">
+                <i class="fas fa-images"></i>
+            </div>
+            <h4>{% trans "No Images Found" %}</h4>
+            <p class="text-muted mb-4">
+                {% if selected_category %}
+                {% trans "No images found in this category. Try another filter or check back later." %}
+                {% else %}
+                {% trans "No images available in the gallery yet. Check back soon!" %}
+                {% endif %}
+            </p>
+            {% if selected_category %}
+            <a href="{% url 'gallery' %}" class="btn"
+               style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); color: white;">
+                <i class="fas fa-th me-2"></i> {% trans "View All Images" %}
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Gallery Statistics -->
+{% if images %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center">{% trans "Gallery Statistics" %}</h2>
+
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_images|default:images.paginator.count }}</div>
+                    <div class="stat-label">{% trans "Total Images" %}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-number">{{ featured_count|default:0 }}</div>
+                    <div class="stat-label">{% trans "Featured Images" %}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-number">{{ categories|length }}</div>
+                    <div class="stat-label">{% trans "Categories" %}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-number">{{ event_images|default:0 }}</div>
+                    <div class="stat-label">{% trans "Event Photos" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Lightbox Modal -->
+<div class="modal fade lightbox-modal" id="lightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Lightbox Header -->
+            <div class="lightbox-header">
+                <h5 class="lightbox-title" id="lightboxTitle"></h5>
+            </div>
+
+            <!-- Lightbox Body -->
+            <div class="modal-body">
+                <!-- Previous Button -->
+                <button class="lightbox-nav prev" id="lightboxPrev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <!-- Image Container -->
+                <div class="lightbox-img-container">
+                    <img id="lightboxImage" class="lightbox-img" src="" alt="">
+                </div>
+
+                <!-- Next Button -->
+                <button class="lightbox-nav next" id="lightboxNext">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <!-- Action Buttons -->
+                <div class="lightbox-actions">
+                    <button class="lightbox-action-btn" id="lightboxDownload" title="{% trans 'Download' %}">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="lightbox-action-btn" data-bs-dismiss="modal" title="{% trans 'Close' %}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lightbox Footer -->
+            <div class="lightbox-footer">
+                <p class="lightbox-description" id="lightboxDescription"></p>
+                <div class="lightbox-meta">
+                    <span id="lightboxCategory"></span>
+                    <span id="lightboxDate"></span>
+                </div>
+                {% if image.event %}
+                <div class="mt-2" id="lightboxEvent">
+                    <a href="#" class="text-white text-decoration-none">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        <span id="lightboxEventTitle"></span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all gallery items
+        const galleryItems = document.querySelectorAll('.gallery-card');
+        const galleryArray = Array.from(galleryItems);
+        let currentIndex = 0;
+
+        // Lightbox elements
+        const lightboxModal = new bootstrap.Modal(document.getElementById('lightboxModal'));
+        const lightboxImage = document.getElementById('lightboxImage');
+        const lightboxTitle = document.getElementById('lightboxTitle');
+        const lightboxDescription = document.getElementById('lightboxDescription');
+        const lightboxCategory = document.getElementById('lightboxCategory');
+        const lightboxDate = document.getElementById('lightboxDate');
+        const lightboxDownload = document.getElementById('lightboxDownload');
+        const lightboxPrev = document.getElementById('lightboxPrev');
+        const lightboxNext = document.getElementById('lightboxNext');
+
+        // Set up click handlers for gallery items
+        galleryItems.forEach((item, index) => {
+            item.addEventListener('click', function(e) {
+                // Don't trigger if clicking on download button
+                if (e.target.closest('.gallery-action-btn') && !e.target.closest('.view-btn')) {
+                    return;
+                }
+
+                currentIndex = index;
+                updateLightbox();
+                lightboxModal.show();
+            });
+        });
+
+        // Update lightbox content
+        function updateLightbox() {
+            const currentItem = galleryArray[currentIndex];
+            const title = currentItem.dataset.title;
+            const description = currentItem.dataset.description || 'No description available';
+            const category = currentItem.dataset.category;
+            const date = currentItem.dataset.date;
+            const imageUrl = currentItem.dataset.imageUrl || currentItem.dataset.thumbnailUrl;
+            const eventTitle = currentItem.dataset.event;
+
+            // Set lightbox content
+            lightboxImage.src = imageUrl;
+            lightboxTitle.textContent = title;
+            lightboxDescription.textContent = description;
+            lightboxCategory.textContent = category;
+            lightboxDate.textContent = date;
+
+            // Set download link
+            lightboxDownload.onclick = function() {
+                const link = document.createElement('a');
+                link.href = imageUrl;
+                link.download = title + '.jpg';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            // Update navigation buttons
+            lightboxPrev.disabled = currentIndex === 0;
+            lightboxNext.disabled = currentIndex === galleryArray.length - 1;
+        }
+
+        // Navigation handlers
+        lightboxPrev.addEventListener('click', function() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateLightbox();
+            }
+        });
+
+        lightboxNext.addEventListener('click', function() {
+            if (currentIndex < galleryArray.length - 1) {
+                currentIndex++;
+                updateLightbox();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (lightboxModal._element.classList.contains('show')) {
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        if (currentIndex > 0) {
+                            currentIndex--;
+                            updateLightbox();
+                        }
+                        break;
+                    case 'ArrowRight':
+                        if (currentIndex < galleryArray.length - 1) {
+                            currentIndex++;
+                            updateLightbox();
+                        }
+                        break;
+                    case 'Escape':
+                        lightboxModal.hide();
+                        break;
+                    case 'd':
+                    case 'D':
+                        lightboxDownload.click();
+                        break;
+                }
+            }
+        });
+
+        // Touch/swipe navigation for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.getElementById('lightboxModal').addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.getElementById('lightboxModal').addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0 && currentIndex < galleryArray.length - 1) {
+                    // Swipe left - next image
+                    currentIndex++;
+                } else if (diff < 0 && currentIndex > 0) {
+                    // Swipe right - previous image
+                    currentIndex--;
+                }
+                updateLightbox();
+            }
+        }
+
+        // Close modal when clicking outside image
+        document.getElementById('lightboxModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                lightboxModal.hide();
+            }
+        });
+
+        // Update filter button active states
+        const filterLinks = document.querySelectorAll('.category-filter .nav-link');
+        filterLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                filterLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Preload images for smooth navigation
+        function preloadImages() {
+            galleryArray.forEach(item => {
+                const imageUrl = item.dataset.imageUrl || item.dataset.thumbnailUrl;
+                if (imageUrl) {
+                    const img = new Image();
+                    img.src = imageUrl;
+                }
+            });
+        }
+
+        // Start preloading after page load
+        window.addEventListener('load', preloadImages);
+    });
+</script>
+{% endblock %}

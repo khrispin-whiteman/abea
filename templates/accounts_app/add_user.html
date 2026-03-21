@@ -1,0 +1,319 @@
+<!-- templates/accounts_app/add_user.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Add User" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>{% trans "Add New User" %}</h4>
+                        <a href="{% url 'manage_users' %}" class="btn btn-sm" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3);">
+                            <i class="fas fa-arrow-left me-1"></i> {% trans "Back" %}
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        {# Display non‑field errors (e.g., form‑wide validation) #}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+
+
+                        <!-- Login Information -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>{% trans "Login Information" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label">
+                                            {% trans "Email Address" %}
+                                            {% if form.email.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.email.errors }}</div>
+                                        {% endif %}
+                                        <small class="text-muted">{% trans "This email will be used as the username for login" %}</small>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.phone.id_for_label }}" class="form-label">
+                                            {% trans "Phone Number" %}
+                                            {% if form.phone.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.phone }}
+                                        {% if form.phone.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.phone.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="alert alert-info">
+                                            <small>{% trans "A random password will be generated and sent to the user's email. The user can reset it later." %}</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mb-2">
+                                            {{ form.is_active }}
+                                            <label class="form-check-label" for="id_is_active">{% trans "Active Account" %}</label>
+                                        </div>
+                                        {% if form.is_active.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.is_active.errors }}</div>
+                                        {% endif %}
+
+                                        <div class="form-check form-switch mb-2">
+                                            {{ form.is_staff }}
+                                            <label class="form-check-label" for="id_is_staff">{% trans "Staff Member" %}</label>
+                                        </div>
+                                        {% if form.is_staff.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.is_staff.errors }}</div>
+                                        {% endif %}
+
+                                        <div class="form-check form-switch">
+                                            {{ form.is_superuser }}
+                                            <label class="form-check-label" for="id_is_superuser">{% trans "Superuser (Full Admin)" %}</label>
+                                        </div>
+                                        {% if form.is_superuser.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.is_superuser.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>{% trans "Personal Information" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-2">
+                                        <label for="{{ form.title.id_for_label }}" class="form-label">
+                                            {% trans "Title" %}
+                                            {% if form.title.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.title }}
+                                        {% if form.title.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.title.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                            {% trans "First Name" %}
+                                            {% if form.first_name.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.first_name.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                            {% trans "Last Name" %}
+                                            {% if form.last_name.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.last_name.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.professional_id.id_for_label }}" class="form-label">
+                                            {% trans "Professional ID" %}
+                                            {% if form.professional_id.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.professional_id }}
+                                        {% if form.professional_id.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.professional_id.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.specialization.id_for_label }}" class="form-label">
+                                            {% trans "Specialization" %}
+                                            {% if form.specialization.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.specialization }}
+                                        {% if form.specialization.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.specialization.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional Information -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>{% trans "Professional Information" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.institution.id_for_label }}" class="form-label">
+                                            {% trans "Institution/Organization" %}
+                                            {% if form.institution.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.institution }}
+                                        {% if form.institution.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.institution.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.position.id_for_label }}" class="form-label">
+                                            {% trans "Position" %}
+                                            {% if form.position.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.position }}
+                                        {% if form.position.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.position.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>{% trans "Additional Information" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.profile_picture.id_for_label }}" class="form-label">
+                                            {% trans "Profile Picture" %}
+                                            {% if form.profile_picture.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.profile_picture }}
+                                        {% if form.profile_picture.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.profile_picture.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            {{ form.is_verified }}
+                                            <label class="form-check-label" for="id_is_verified">{% trans "Verified Account" %}</label>
+                                        </div>
+                                        {% if form.is_verified.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.is_verified.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="{{ form.bio.id_for_label }}" class="form-label">
+                                            {% trans "Biography" %}
+                                            {% if form.bio.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        </label>
+                                        {{ form.bio }}
+                                        {% if form.bio.errors %}
+                                            <div class="text-danger mt-1 small">{{ form.bio.errors }}</div>
+                                        {% endif %}
+                                        <small class="text-muted">{% trans "Tell us about yourself" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'manage_users' %}" class="btn" style="background: linear-gradient(135deg, #6c757d, #495057); border: none; color: white;">
+                                <i class="fas fa-times me-2"></i> {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                <i class="fas fa-save me-2"></i> {% trans "Create User" %}
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --dark-red: #b71c1c;
+    }
+
+    .card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        border-bottom: none;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.75rem;
+    }
+
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+        width: 100%;
+        display: block;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.95rem;
+        transition: all 0.25s ease-in-out;
+        background-color: #fff;
+    }
+
+    textarea { min-height: 120px; resize: vertical; }
+
+    .form-check.form-switch { display: flex; align-items: center; gap: 0.6rem; }
+    .form-check-input:checked { background-color: var(--primary-green); border-color: var(--primary-green); }
+    .form-check-label { font-weight: 500; color: var(--primary-green); }
+
+    .btn { padding: 0.7rem 1.6rem; border-radius: 10px; font-weight: 500; transition: all 0.25s ease; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+
+    @media (max-width: 768px) {
+        .card-body { padding: 1.25rem; }
+        h4, h5 { font-size: 1.05rem; }
+        .btn { width: 100%; }
+        .d-flex.justify-content-between { flex-direction: column; gap: 1rem; }
+    }
+</style>
+{% endblock %}

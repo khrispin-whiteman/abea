@@ -1,0 +1,402 @@
+<!-- templates/abea_app/membership.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title|default:"Membership Plans - ABEA" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+    }
+
+    .membership-hero {
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-gray) 100%);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    .membership-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        height: 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-top: 4px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .membership-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .membership-card.popular {
+        border-color: var(--accent-red);
+        transform: scale(1.05);
+    }
+
+    .membership-card.popular::before {
+        content: 'POPULAR';
+        position: absolute;
+        top: 20px;
+        right: -35px;
+        background: var(--accent-red);
+        color: white;
+        padding: 5px 35px;
+        transform: rotate(45deg);
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 1;
+    }
+
+    .membership-price {
+        font-size: 2.5rem;
+        font-weight: bold;
+        background: linear-gradient(135deg, var(--primary-green), var(--accent-red));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .membership-features {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .membership-features li {
+        padding: 8px 0;
+        border-bottom: 1px solid var(--light-gray);
+        display: flex;
+        align-items: center;
+    }
+
+    .membership-features li:last-child {
+        border-bottom: none;
+    }
+
+    .feature-check {
+        color: var(--primary-green);
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .membership-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 1;
+    }
+
+    .section-title {
+        position: relative;
+        margin-bottom: 3rem;
+        padding-bottom: 1rem;
+        color: var(--primary-green);
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--accent-red));
+        border-radius: 2px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+    }
+
+    .btn-outline-primary {
+        border: 2px solid var(--primary-green);
+        color: var(--primary-green);
+        background: transparent;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-green);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .membership-card.popular {
+            transform: scale(1);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Membership Hero -->
+<section class="membership-hero">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-4">{% trans "Choose Your Membership Plan" %}</h1>
+        <p class="lead mb-0">
+            {% trans "Join the Africa Biomedical Engineering Alliance and access exclusive benefits, resources, and networking opportunities." %}
+        </p>
+    </div>
+</section>
+
+<!-- Membership Plans -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            {% for plan in plans %}
+            <div class="col-lg-4 col-md-6">
+                <div class="membership-card {% if plan.is_popular %}popular{% endif %}">
+                    {% if plan.is_popular %}
+                    <div class="membership-badge">
+                        <span class="badge" style="background: var(--accent-red); padding: 8px 15px;">
+                            {% trans "Most Popular" %}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <div class="text-center mb-4">
+                        <h3 style="color: var(--primary-green);">{{ plan.name }}</h3>
+                        <p class="text-muted">{{ plan.get_plan_type_display }}</p>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <div class="membership-price">
+                            {{ plan.currency | upper }} {{ plan.price }}
+                        </div>
+                        <p class="text-muted">
+{#                            {% trans "per year" %} ({{ plan.duration_months }} {% trans "months" %})#}
+                            ({{ plan.duration_months }} {% trans "months" %})
+                        </p>
+                    </div>
+
+                    <p class="text-center text-muted mb-4">{{ plan.description }}</p>
+
+                    {% if plan.benefits %}
+                    <div class="mb-4">
+                        <h6 style="color: var(--primary-green);">{% trans "Key Benefits" %}</h6>
+                        <p>{{ plan.benefits|truncatewords:30 }}</p>
+                    </div>
+                    {% endif %}
+
+                    <ul class="membership-features mb-4">
+                        {% for feature in plan.features %}
+                        <li>
+                            <i class="fas fa-check feature-check"></i>
+                            {{ feature }}
+                        </li>
+                        {% empty %}
+                        <li class="text-muted">
+                            <i class="fas fa-info-circle feature-check"></i>
+                            {% trans "All standard membership benefits" %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="d-grid">
+                        {% if current_subscription and current_subscription.membership_plan.id == plan.id %}
+                        <button class="btn btn-success" disabled>
+                            <i class="fas fa-check me-2"></i>{% trans "Current Plan" %}
+                        </button>
+                        <small class="text-center text-muted mt-2">
+                            {% trans "Expires" %} {{ current_subscription.end_date|date:"M d, Y" }}
+                        </small>
+                        {% else %}
+                        <a href="{% url 'initiate_payment' plan.id %}"
+                           class="btn {% if plan.is_popular %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            {% trans "Select Plan" %}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                     style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                    <i class="fas fa-users fa-3x text-white"></i>
+                </div>
+                <h4>{% trans "Membership plans coming soon" %}</h4>
+                <p class="text-muted">{% trans "Check back soon for our membership options!" %}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Membership Benefits -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center">{% trans "Membership Benefits" %}</h2>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center p-4">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                        <i class="fas fa-network-wired fa-2x text-white"></i>
+                    </div>
+                    <h4 style="color: var(--primary-green);">{% trans "Networking" %}</h4>
+                    <p class="text-muted">
+                        {% trans "Connect with biomedical engineering professionals across Africa through our exclusive network." %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="text-center p-4">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent-red), #f44336);">
+                        <i class="fas fa-graduation-cap fa-2x text-white"></i>
+                    </div>
+                    <h4 style="color: var(--accent-red);">{% trans "Professional Development" %}</h4>
+                    <p class="text-muted">
+                        {% trans "Access exclusive training, workshops, and educational resources to advance your career." %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="text-center p-4">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray));">
+                        <i class="fas fa-bullhorn fa-2x text-white"></i>
+                    </div>
+                    <h4 style="color: var(--dark-gray);">{% trans "Advocacy" %}</h4>
+                    <p class="text-muted">
+                        {% trans "Have your voice heard in policy discussions shaping the future of biomedical engineering in Africa." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title text-center">{% trans "Frequently Asked Questions" %}</h2>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="membershipFAQ">
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1"
+                                    style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.1)); color: var(--primary-green);">
+                                {% trans "Who can become a member of ABEA?" %}
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#membershipFAQ">
+                            <div class="accordion-body">
+                                {% trans "ABEA membership is open to national biomedical engineering associations, regional organizations, individual professionals, students, and honorary members. We have different membership tiers to accommodate various needs." %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2"
+                                    style="background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(244, 67, 54, 0.1)); color: var(--accent-red);">
+                                {% trans "How do I renew my membership?" %}
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#membershipFAQ">
+                            <div class="accordion-body">
+                                {% trans "Memberships are renewed annually. You will receive a renewal notification 30 days before your membership expires. You can renew online through your dashboard or contact our membership team for assistance." %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3"
+                                    style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.1)); color: var(--primary-green);">
+                                {% trans "Can I upgrade or downgrade my membership plan?" %}
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#membershipFAQ">
+                            <div class="accordion-body">
+                                {% trans "Yes, you can upgrade your membership at any time. The difference in fee will be prorated. Downgrades are typically processed at the time of renewal. Contact our membership team for assistance with plan changes." %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4"
+                                    style="background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(244, 67, 54, 0.1)); color: var(--accent-red);">
+                                {% trans "What payment methods do you accept?" %}
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#membershipFAQ">
+                            <div class="accordion-body">
+                                {% trans "We accept various payment methods including bank transfers, mobile money (MTN, Airtel, Vodafone, Orange), credit cards, and PayPal. Payment options may vary by region. Contact us for specific payment options available in your country." %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-gray) 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="mb-3">{% trans "Ready to Join ABEA?" %}</h3>
+                <p class="mb-0 opacity-90">
+                    {% trans "Have questions about membership? Our team is here to help you choose the right plan for your needs." %}
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'contact' %}" class="btn btn-lg fw-bold"
+                   style="background: linear-gradient(135deg, #ffffff, var(--light-gray)); color: var(--dark-gray);">
+                    <i class="fas fa-envelope me-2"></i>{% trans "Contact Us" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>Update Subscription: {{ subscription.user.email }} - {{ subscription.membership_plan.name }}</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label">Current Status:</label>
+                    <div class="alert alert-info">
+                        Payment: {{ subscription.get_payment_status_display }}<br>
+                        Active: {{ subscription.is_active|yesno:"Yes,No" }}<br>
+                        Amount: ${{ subscription.amount_paid }}<br>
+                        Transaction ID: {{ subscription.transaction_id|default:"None" }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Action:</label>
+                    <select name="action" class="form-select" required>
+                        <option value="">Select action...</option>
+                        <option value="approve">Approve Payment & Activate</option>
+                        <option value="reject">Reject Payment</option>
+                        <option value="refund">Mark as Refunded</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Notes:</label>
+                    <textarea name="notes" class="form-control" rows="3" 
+                              placeholder="Reason for manual update..."></textarea>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{% url 'admin:abea_app_subscription_change' object_id=subscription.id %}" 
+                       class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

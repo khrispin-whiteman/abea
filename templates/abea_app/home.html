@@ -1,0 +1,703 @@
+<!-- templates/abea_app/home.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title|default:"Home - Africa Biomedical Engineering Alliance" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+    }
+
+    /* Hero Carousel */
+    .hero-carousel {
+        position: relative;
+        overflow: hidden;
+        margin-top: 0;
+    }
+
+    .carousel-item {
+        height: 85vh;
+        min-height: 500px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .carousel-item:nth-child(1) {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1551601651-2a8555f1a136?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+    }
+
+    .carousel-item:nth-child(2) {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+    }
+
+    .carousel-item:nth-child(3) {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+    }
+
+    .carousel-caption {
+        top: 50%;
+        transform: translateY(-50%);
+        bottom: initial;
+    }
+
+    .carousel-caption h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: white;
+    }
+
+    .carousel-caption p {
+        font-size: 1.3rem;
+        max-width: 700px;
+        margin: 0 auto 2rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+    }
+
+    .carousel-indicators button {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin: 0 5px;
+    }
+
+    .section-title {
+        position: relative;
+        margin-bottom: 3rem;
+        padding-bottom: 1rem;
+        color: var(--primary-green);
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--accent-red));
+        border-radius: 2px;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2.5rem;
+        text-align: center;
+        height: 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-top: 4px solid transparent;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-card-green {
+        border-top-color: var(--primary-green);
+    }
+
+    .feature-card-red {
+        border-top-color: var(--accent-red);
+    }
+
+    .feature-card-gray {
+        border-top-color: var(--medium-gray);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .feature-icon-green {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+    }
+
+    .feature-icon-red {
+        background: linear-gradient(135deg, var(--accent-red), #f44336);
+    }
+
+    .feature-icon-gray {
+        background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray));
+    }
+
+    .news-category-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 1;
+    }
+
+    .event-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 1;
+    }
+
+    /* Partners Carousel Styles */
+    .partners-section {
+        padding: 5rem 0;
+        background-color: white;
+    }
+
+    .partners-carousel-container {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+    }
+
+    .partner-carousel-item {
+        text-align: center;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .partner-carousel-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .partner-logo-container {
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        padding: 15px;
+        background-color: var(--light-gray);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .partner-carousel-item:hover .partner-logo-container {
+        background-color: #e8f5e9;
+        box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
+    }
+
+    .partner-logo {
+        max-width: 100%;
+        max-height: 90px;
+        object-fit: contain;
+        filter: grayscale(100%);
+        opacity: 0.8;
+        transition: all 0.3s ease;
+    }
+
+    .partner-carousel-item:hover .partner-logo {
+        filter: grayscale(0%);
+        opacity: 1;
+    }
+
+    .partner-name {
+        color: var(--dark-gray);
+        font-weight: 600;
+        margin-bottom: 5px;
+        transition: color 0.3s ease;
+    }
+
+    .partner-type {
+        color: var(--medium-gray);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .partner-link {
+        text-decoration: none;
+        display: block;
+        color: inherit;
+    }
+
+    .partner-link:hover {
+        text-decoration: none;
+    }
+
+    .partner-carousel-item:hover .partner-name {
+        color: var(--primary-green);
+    }
+
+    /* Owl Carousel Customizations */
+    .owl-nav {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        transform: translateY(-50%);
+        display: flex;
+        justify-content: space-between;
+        pointer-events: none;
+    }
+
+    .owl-nav button {
+        pointer-events: all;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-green) !important;
+        color: white !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px !important;
+        transition: all 0.3s ease;
+    }
+
+    .owl-nav button:hover {
+        background-color: var(--accent-red) !important;
+        transform: scale(1.1);
+    }
+
+    .owl-dots {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .owl-dot {
+        width: 12px;
+        height: 12px;
+        background-color: var(--light-gray) !important;
+        border-radius: 50%;
+        margin: 0 5px;
+        transition: all 0.3s ease;
+    }
+
+    .owl-dot.active {
+        background-color: var(--primary-green) !important;
+        transform: scale(1.2);
+    }
+
+    .owl-dot:hover {
+        background-color: var(--accent-red) !important;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, var(--accent-red), #f44336);
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+        .carousel-caption h1 {
+            font-size: 2rem;
+        }
+
+        .carousel-caption p {
+            font-size: 1rem;
+        }
+
+        .carousel-item {
+            height: 70vh;
+            min-height: 400px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .partners-carousel-container {
+            padding: 0 20px;
+        }
+
+        .partner-logo-container {
+            height: 100px;
+        }
+
+        .partner-logo {
+            max-height: 70px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .owl-nav {
+            display: none;
+        }
+
+        .partners-carousel-container {
+            padding: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Carousel -->
+<section class="hero-carousel">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="carousel-caption text-center">
+                    <h1>{% trans "Advancing Biomedical Engineering in Africa" %}</h1>
+                    <p>{% trans "Uniting and empowering biomedical engineering professionals across Africa to address healthcare challenges through innovation and collaboration." %}</p>
+                    <a href="{% url 'membership' %}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-users me-2"></i>{% trans "Join Our Alliance" %}
+                    </a>
+                    <a href="{% url 'about' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-info-circle me-2"></i>{% trans "Learn More" %}
+                    </a>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="carousel-caption text-center">
+                    <h1>{% trans "Innovation & Research Excellence" %}</h1>
+                    <p>{% trans "Driving cutting-edge research and innovation in biomedical engineering to transform healthcare delivery across the continent." %}</p>
+                    <a href="{% url 'news_list' %}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-flask me-2"></i>{% trans "View Research" %}
+                    </a>
+                    <a href="{% url 'events_list' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-calendar me-2"></i>{% trans "Upcoming Events" %}
+                    </a>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="carousel-caption text-center">
+                    <h1>{% trans "Building Capacity Across Africa" %}</h1>
+                    <p>{% trans "Developing the next generation of biomedical engineering leaders through education, mentorship, and professional development." %}</p>
+                    <a href="{% url 'partners' %}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-handshake me-2"></i>{% trans "Our Partners" %}
+                    </a>
+                    <a href="{% url 'contact' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-envelope me-2"></i>{% trans "Contact Us" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center">{% trans "Our Core Objectives" %}</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card feature-card-green">
+                    <div class="feature-icon feature-icon-green">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h4 class="mb-3" style="color: var(--primary-green);">{% trans "Collaboration & Networking" %}</h4>
+                    <p class="text-muted">
+                        {% trans "Promote collaboration, research, and knowledge exchange among biomedical engineering professionals across Africa." %}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card feature-card-red">
+                    <div class="feature-icon feature-icon-red">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h4 class="mb-3" style="color: var(--accent-red);">{% trans "Capacity Building" %}</h4>
+                    <p class="text-muted">
+                        {% trans "Facilitate capacity building, professional development, and educational initiatives for biomedical engineers." %}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card feature-card-gray">
+                    <div class="feature-icon feature-icon-gray">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h4 class="mb-3" style="color: var(--dark-gray);">{% trans "Policy Advocacy" %}</h4>
+                    <p class="text-muted">
+                        {% trans "Advocate for policies supporting biomedical engineering education, practice, and research across Africa." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest News Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title mb-0">{% trans "Latest News & Updates" %}</h2>
+            <a href="{% url 'news_list' %}" class="btn btn-outline-primary">
+                {% trans "View All News" %} <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for news in latest_news %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm position-relative">
+                    {% if news.image %}
+                    <img src="{{ news.image.url }}" class="card-img-top" alt="{{ news.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, var(--light-gray), var(--medium-gray));">
+                        <i class="fas fa-newspaper fa-3x" style="color: var(--primary-green);"></i>
+                    </div>
+                    {% endif %}
+                    <span class="news-category-badge badge" style="background: var(--accent-red);">
+                        {{ news.get_category_display }}
+                    </span>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ news.title }}</h5>
+                        <p class="card-text text-muted">
+                            {{ news.excerpt|default:news.content|truncatewords:20 }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="far fa-calendar me-1"></i> {{ news.publish_date|date:"M d, Y" }}
+                            </small>
+                            <a href="{% url 'news_detail' news.slug %}" class="btn btn-sm" style="background-color: var(--primary-green); color: white;">
+                                {% trans "Read More" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                     style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                    <i class="fas fa-newspaper fa-3x text-white"></i>
+                </div>
+                <h4>{% trans "No news available yet" %}</h4>
+                <p class="text-muted">{% trans "Check back soon for updates!" %}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Events Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title mb-0">{% trans "Upcoming Events" %}</h2>
+            <a href="{% url 'events_list' %}" class="btn btn-outline-primary">
+                {% trans "All Events" %} <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for event in upcoming_events %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="position-relative">
+                        {% if event.image %}
+                        <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                            <i class="fas fa-calendar-alt fa-3x text-white"></i>
+                        </div>
+                        {% endif %}
+                        <span class="event-badge badge" style="background: var(--accent-red);">
+                            {% if event.is_free %}{% trans "FREE" %}{% else %}${{ event.fee }}{% endif %}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <span class="badge" style="background-color: var(--medium-gray); color: white;">{{ event.get_event_type_display }}</span>
+                        <h5 class="card-title mt-2">{{ event.title }}</h5>
+                        <p class="card-text text-muted">
+                            {{ event.short_description|default:event.description|truncatewords:15 }}
+                        </p>
+                        <div class="event-details">
+                            <p class="mb-1">
+                                <i class="far fa-calendar-alt me-2" style="color: var(--primary-green);"></i>
+                                {{ event.start_date|date:"M d, Y" }}
+                            </p>
+                            <p class="mb-3">
+                                <i class="fas fa-map-marker-alt me-2" style="color: var(--primary-green);"></i>
+                                {% if event.is_online %}
+                                <span style="color: var(--accent-red);">{% trans "Online Event" %}</span>
+                                {% else %}
+                                {{ event.location|default:"TBA" }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <a href="{% url 'event_detail' event.slug %}" class="btn btn-primary w-100">
+                            <i class="fas fa-info-circle me-2"></i>{% trans "View Details" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                     style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--accent-red), #f44336);">
+                    <i class="fas fa-calendar-alt fa-3x text-white"></i>
+                </div>
+                <h4>{% trans "No upcoming events" %}</h4>
+                <p class="text-muted">{% trans "Stay tuned for upcoming events!" %}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Partners Section -->
+<section class="partners-section">
+    <div class="container">
+        <h2 class="section-title text-center">{% trans "Our Valued Partners" %}</h2>
+        <p class="text-center text-muted mb-5">{% trans "Collaborating with leading organizations across Africa and beyond" %}</p>
+
+        <div class="partners-carousel-container">
+            <div class="owl-carousel partners-carousel">
+                {% for partner in partners %}
+                <div class="partner-carousel-item">
+                    <a href="{% url 'partner_detail' partner.slug %}" class="partner-link" title="{{ partner.name }}">
+{#                    <a href="" class="partner-link" title="{{ partner.name }}">#}
+                        <div class="partner-logo-container">
+                            {% if partner.logo %}
+                            <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="partner-logo">
+                            {% else %}
+                            <div class="partner-logo-placeholder d-flex align-items-center justify-content-center">
+                                <i class="fas fa-handshake fa-3x" style="color: var(--primary-green);"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <h5 class="partner-name">{{ partner.name }}</h5>
+                        <div class="partner-type">{{ partner.get_partner_type_display }}</div>
+                        <small class="text-muted">{% trans "View Details" %} <i class="fas fa-arrow-right"></i></small>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                         style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                        <i class="fas fa-handshake fa-3x text-white"></i>
+                    </div>
+                    <h4>{% trans "No partners available yet" %}</h4>
+                    <p class="text-muted">{% trans "Check back soon for our partner organizations!" %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{% url 'partners' %}" class="btn btn-primary">
+                <i class="fas fa-handshake me-2"></i>{% trans "View All Partners" %}
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-gray) 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="mb-3">{% trans "Join the Africa Biomedical Engineering Alliance Today!" %}</h3>
+                <p class="mb-0 opacity-90">
+                    {% trans "Become part of a growing network of biomedical engineering professionals shaping the future of healthcare in Africa." %}
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'membership' %}" class="btn btn-danger btn-lg fw-bold">
+                    <i class="fas fa-user-plus me-2"></i>{% trans "Join Now" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize hero carousel with autoplay
+        $('#heroCarousel').carousel({
+            interval: 5000,
+            ride: 'carousel'
+        });
+
+        // Initialize partners carousel
+        $('.partners-carousel').owlCarousel({
+            loop: true,
+            margin: 30,
+            nav: true,
+            dots: true,
+            autoplay: true,
+            autoplayTimeout: 3000,
+            autoplayHoverPause: true,
+            responsive: {
+                0: {
+                    items: 1
+                },
+                576: {
+                    items: 2
+                },
+                768: {
+                    items: 3
+                },
+                992: {
+                    items: 4
+                },
+                1200: {
+                    items: 5
+                }
+            },
+            navText: [
+                '<i class="fas fa-chevron-left"></i>',
+                '<i class="fas fa-chevron-right"></i>'
+            ]
+        });
+
+        // Smooth scroll for anchor links
+        $('a[href^="#"]').on('click', function(event) {
+            if (this.hash !== "") {
+                event.preventDefault();
+                const hash = this.hash;
+                $('html, body').animate({
+                    scrollTop: $(hash).offset().top - 70
+                }, 800);
+            }
+        });
+    });
+</script>
+{% endblock %}

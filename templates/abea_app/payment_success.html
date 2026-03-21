@@ -1,0 +1,871 @@
+{#{% extends 'base.html' %}#}
+{#{% load static i18n %}#}
+{##}
+{#{% block title %}{% trans "Payment Successful" %} - ABEA{% endblock %}#}
+{##}
+{#{% block extra_css %}#}
+{#<style>#}
+{#    :root {#}
+{#        --primary-green: #2e7d32;#}
+{#        --secondary-green: #4caf50;#}
+{#        --accent-red: #d32f2f;#}
+{#        --dark-red: #b71c1c;#}
+{#        --light-gray: #f5f5f5;#}
+{#        --medium-gray: #9e9e9e;#}
+{#        --dark-gray: #424242;#}
+{#        --accent-yellow: #fbbc04;#}
+{#    }#}
+{##}
+{#    .payment-success-container {#}
+{#        min-height: 70vh;#}
+{#        display: flex;#}
+{#        align-items: center;#}
+{#        justify-content: center;#}
+{#        padding: 40px 20px;#}
+{#        background: linear-gradient(135deg, rgba(46, 125, 50, 0.03), rgba(76, 175, 80, 0.02));#}
+{#    }#}
+{##}
+{#    .success-card {#}
+{#        background: white;#}
+{#        border-radius: 20px;#}
+{#        padding: 40px;#}
+{#        max-width: 600px;#}
+{#        width: 100%;#}
+{#        box-shadow: 0 20px 60px rgba(46, 125, 50, 0.15);#}
+{#        border-top: 8px solid var(--primary-green);#}
+{#        text-align: center;#}
+{#        position: relative;#}
+{#        overflow: hidden;#}
+{#    }#}
+{##}
+{#    .success-card::before {#}
+{#        content: '';#}
+{#        position: absolute;#}
+{#        top: 0;#}
+{#        left: 0;#}
+{#        right: 0;#}
+{#        height: 4px;#}
+{#        background: linear-gradient(90deg, var(--primary-green), var(--secondary-green), var(--primary-green));#}
+{#        animation: shimmer 3s infinite linear;#}
+{#    }#}
+{##}
+{#    @keyframes shimmer {#}
+{#        0% { background-position: -600px 0; }#}
+{#        100% { background-position: 600px 0; }#}
+{#    }#}
+{##}
+{#    .success-icon {#}
+{#        width: 120px;#}
+{#        height: 120px;#}
+{#        border-radius: 50%;#}
+{#        background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.05));#}
+{#        display: flex;#}
+{#        align-items: center;#}
+{#        justify-content: center;#}
+{#        margin: 0 auto 30px;#}
+{#        position: relative;#}
+{#    }#}
+{##}
+{#    .success-icon::after {#}
+{#        content: '';#}
+{#        position: absolute;#}
+{#        width: 100%;#}
+{#        height: 100%;#}
+{#        border-radius: 50%;#}
+{#        border: 2px dashed var(--primary-green);#}
+{#        opacity: 0.3;#}
+{#        animation: spin 20s linear infinite;#}
+{#    }#}
+{##}
+{#    @keyframes spin {#}
+{#        100% { transform: rotate(360deg); }#}
+{#    }#}
+{##}
+{#    .success-icon i {#}
+{#        font-size: 50px;#}
+{#        color: var(--primary-green);#}
+{#        z-index: 1;#}
+{#    }#}
+{##}
+{#    .confetti {#}
+{#        position: absolute;#}
+{#        width: 100%;#}
+{#        height: 100%;#}
+{#        top: 0;#}
+{#        left: 0;#}
+{#        pointer-events: none;#}
+{#        overflow: hidden;#}
+{#    }#}
+{##}
+{#    .confetti-piece {#}
+{#        position: absolute;#}
+{#        width: 10px;#}
+{#        height: 20px;#}
+{#        background: var(--primary-green);#}
+{#        top: -20px;#}
+{#        opacity: 0;#}
+{#    }#}
+{##}
+{#    .success-title {#}
+{#        color: var(--primary-green);#}
+{#        font-size: 2.5rem;#}
+{#        font-weight: 700;#}
+{#        margin-bottom: 15px;#}
+{#        line-height: 1.2;#}
+{#    }#}
+{##}
+{#    .success-message {#}
+{#        color: var(--dark-gray);#}
+{#        font-size: 1.2rem;#}
+{#        line-height: 1.6;#}
+{#        margin-bottom: 30px;#}
+{#        max-width: 500px;#}
+{#        margin-left: auto;#}
+{#        margin-right: auto;#}
+{#    }#}
+{##}
+{#    .subscription-info {#}
+{#        background: linear-gradient(135deg, rgba(248, 255, 248, 0.8), rgba(240, 255, 240, 0.9));#}
+{#        border-radius: 12px;#}
+{#        padding: 25px;#}
+{#        margin: 30px 0;#}
+{#        border: 1px solid rgba(46, 125, 50, 0.1);#}
+{#        text-align: left;#}
+{#    }#}
+{##}
+{#    .info-row {#}
+{#        display: flex;#}
+{#        margin-bottom: 12px;#}
+{#        padding-bottom: 12px;#}
+{#        border-bottom: 1px solid rgba(0, 0, 0, 0.05);#}
+{#    }#}
+{##}
+{#    .info-row:last-child {#}
+{#        margin-bottom: 0;#}
+{#        padding-bottom: 0;#}
+{#        border-bottom: none;#}
+{#    }#}
+{##}
+{#    .info-label {#}
+{#        font-weight: 600;#}
+{#        color: var(--primary-green);#}
+{#        min-width: 150px;#}
+{#    }#}
+{##}
+{#    .receipt-badge {#}
+{#        display: inline-block;#}
+{#        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));#}
+{#        color: white;#}
+{#        padding: 8px 20px;#}
+{#        border-radius: 20px;#}
+{#        font-weight: 600;#}
+{#        margin: 10px 0;#}
+{#        box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);#}
+{#    }#}
+{##}
+{#    .action-buttons {#}
+{#        display: flex;#}
+{#        flex-wrap: wrap;#}
+{#        gap: 15px;#}
+{#        justify-content: center;#}
+{#        margin-top: 30px;#}
+{#    }#}
+{##}
+{#    .btn {#}
+{#        padding: 14px 30px;#}
+{#        border-radius: 10px;#}
+{#        font-weight: 600;#}
+{#        text-decoration: none;#}
+{#        display: inline-flex;#}
+{#        align-items: center;#}
+{#        justify-content: center;#}
+{#        transition: all 0.3s ease;#}
+{#        min-width: 180px;#}
+{#        border: none;#}
+{#        cursor: pointer;#}
+{#    }#}
+{##}
+{#    .btn-dashboard {#}
+{#        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));#}
+{#        color: white;#}
+{#        box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);#}
+{#    }#}
+{##}
+{#    .btn-dashboard:hover {#}
+{#        transform: translateY(-3px);#}
+{#        box-shadow: 0 10px 30px rgba(46, 125, 50, 0.4);#}
+{#        background: linear-gradient(135deg, var(--secondary-green), var(--primary-green));#}
+{#        color: white;#}
+{#    }#}
+{##}
+{#    .btn-print {#}
+{#        background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray));#}
+{#        color: white;#}
+{#    }#}
+{##}
+{#    .btn-print:hover {#}
+{#        transform: translateY(-3px);#}
+{#        box-shadow: 0 10px 30px rgba(66, 66, 66, 0.3);#}
+{#        background: linear-gradient(135deg, var(--dark-gray), var(--medium-gray));#}
+{#        color: white;#}
+{#    }#}
+{##}
+{#    .btn-benefits {#}
+{#        background: linear-gradient(135deg, var(--accent-yellow), #ff9800);#}
+{#        color: #333;#}
+{#    }#}
+{##}
+{#    .btn-benefits:hover {#}
+{#        transform: translateY(-3px);#}
+{#        box-shadow: 0 10px 30px rgba(255, 193, 7, 0.3);#}
+{#        background: linear-gradient(135deg, #ff9800, var(--accent-yellow));#}
+{#        color: #333;#}
+{#    }#}
+{##}
+{#    .welcome-gift {#}
+{#        margin-top: 40px;#}
+{#        padding: 25px;#}
+{#        background: linear-gradient(135deg, rgba(251, 188, 4, 0.1), rgba(255, 193, 7, 0.05));#}
+{#        border-radius: 12px;#}
+{#        border: 1px solid rgba(251, 188, 4, 0.2);#}
+{#    }#}
+{##}
+{#    .welcome-gift h5 {#}
+{#        color: var(--accent-yellow);#}
+{#        margin-bottom: 15px;#}
+{#        display: flex;#}
+{#        align-items: center;#}
+{#        justify-content: center;#}
+{#        gap: 10px;#}
+{#    }#}
+{##}
+{#    .gift-list {#}
+{#        list-style: none;#}
+{#        padding-left: 0;#}
+{#        text-align: left;#}
+{#        max-width: 400px;#}
+{#        margin: 0 auto;#}
+{#    }#}
+{##}
+{#    .gift-list li {#}
+{#        padding: 10px 0 10px 35px;#}
+{#        position: relative;#}
+{#        border-bottom: 1px solid rgba(0, 0, 0, 0.05);#}
+{#    }#}
+{##}
+{#    .gift-list li:last-child {#}
+{#        border-bottom: none;#}
+{#    }#}
+{##}
+{#    .gift-list li::before {#}
+{#        content: '🎁';#}
+{#        position: absolute;#}
+{#        left: 0;#}
+{#        top: 10px;#}
+{#        font-size: 1.2rem;#}
+{#    }#}
+{##}
+{#    @media (max-width: 768px) {#}
+{#        .success-card {#}
+{#            padding: 30px 20px;#}
+{#        }#}
+{##}
+{#        .success-title {#}
+{#            font-size: 2rem;#}
+{#        }#}
+{##}
+{#        .success-icon {#}
+{#            width: 100px;#}
+{#            height: 100px;#}
+{#        }#}
+{##}
+{#        .success-icon i {#}
+{#            font-size: 40px;#}
+{#        }#}
+{##}
+{#        .action-buttons {#}
+{#            flex-direction: column;#}
+{#        }#}
+{##}
+{#        .btn {#}
+{#            width: 100%;#}
+{#        }#}
+{##}
+{#        .info-row {#}
+{#            flex-direction: column;#}
+{#        }#}
+{##}
+{#        .info-label {#}
+{#            min-width: auto;#}
+{#            margin-bottom: 5px;#}
+{#        }#}
+{#    }#}
+{#</style>#}
+{#{% endblock %}#}
+{##}
+{#{% block content %}#}
+{#<div class="payment-success-container">#}
+{#    <div class="success-card">#}
+{#        <!-- Confetti Animation -->#}
+{#        <div class="confetti" id="confetti"></div>#}
+{##}
+{#        <!-- Animated Success Icon -->#}
+{#        <div class="success-icon">#}
+{#            <i class="fas fa-check-circle"></i>#}
+{#        </div>#}
+{##}
+{#        <!-- Title -->#}
+{#        <h1 class="success-title">{% trans "Payment Successful!" %}</h1>#}
+{##}
+{#        <!-- Main Message -->#}
+{#        <div class="success-message">#}
+{#            {% trans "Thank you for joining ABEA. Your membership is now active. Welcome to our community!" %}#}
+{#        </div>#}
+{##}
+{#        <!-- Receipt Badge -->#}
+{#        {% if subscription.receipt_number %}#}
+{#        <div class="receipt-badge">#}
+{#            <i class="fas fa-receipt me-2"></i>{% trans "Receipt" %}: {{ subscription.receipt_number }}#}
+{#        </div>#}
+{#        {% endif %}#}
+{##}
+{#        <!-- Subscription Information -->#}
+{#        <div class="subscription-info">#}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Plan" %}:</div>#}
+{#                <div>#}
+{#                    <strong>{{ subscription.membership_plan.name }}</strong><br>#}
+{#                    <small class="text-muted">{{ subscription.membership_plan.get_plan_type_display }}</small>#}
+{#                </div>#}
+{#            </div>#}
+{##}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Amount Paid" %}:</div>#}
+{#                <div><strong style="color: var(--primary-green);">${{ subscription.amount_paid }}</strong></div>#}
+{#            </div>#}
+{##}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Payment Method" %}:</div>#}
+{#                <div>#}
+{#                    {{ subscription.get_payment_method_display }}#}
+{#                    {% if subscription.transaction_id %}#}
+{#                    <div class="text-muted small mt-1">#}
+{#                        {% trans "Transaction" %}: {{ subscription.transaction_id }}#}
+{#                    </div>#}
+{#                    {% endif %}#}
+{#                </div>#}
+{#            </div>#}
+{##}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Membership Period" %}:</div>#}
+{#                <div>#}
+{#                    {{ subscription.start_date|date:"M d, Y" }} - {{ subscription.end_date|date:"M d, Y" }}<br>#}
+{#                    <small class="text-muted">#}
+{#                        {% blocktranslate count months=subscription.membership_plan.duration_months trimmed %}#}
+{#                            {{ months }} month membership#}
+{#                        {% plural %}#}
+{#                            {{ months }} months membership#}
+{#                        {% endblocktranslate %}#}
+{#                    </small>#}
+{#                </div>#}
+{#            </div>#}
+{##}
+{#            <div class="info-row">#}
+{#                <div class="info-label">{% trans "Payment Date" %}:</div>#}
+{#                <div>{{ subscription.payment_date|date:"F j, Y g:i A" }}</div>#}
+{#            </div>#}
+{#        </div>#}
+{##}
+{#        <!-- Email Notification -->#}
+{#        <div class="alert alert-info" style="background: rgba(33, 150, 243, 0.1); border: none; margin: 20px 0;">#}
+{#            <i class="fas fa-envelope me-2"></i>#}
+{#            {% trans "A receipt has been sent to your email address. Please check your inbox." %}#}
+{#        </div>#}
+{##}
+{#        <!-- Action Buttons -->#}
+{#        <div class="action-buttons">#}
+{#            <a href="{% url 'dashboard' %}" class="btn btn-dashboard">#}
+{#                <i class="fas fa-tachometer-alt me-2"></i>{% trans "Go to Dashboard" %}#}
+{#            </a>#}
+{##}
+{#            <button onclick="window.print()" class="btn btn-print">#}
+{#                <i class="fas fa-print me-2"></i>{% trans "Print Receipt" %}#}
+{#            </button>#}
+{##}
+{#            <a href="{% url 'subscription_history' %}" class="btn btn-benefits">#}
+{#                <i class="fas fa-receipt me-2"></i>{% trans "View Subscription" %}#}
+{#            </a>#}
+{#        </div>#}
+{##}
+{#        <!-- Welcome Gift Section -->#}
+{#        <div class="welcome-gift">#}
+{#            <h5>#}
+{#                <i class="fas fa-gift"></i>#}
+{#                {% trans "Your Membership Benefits" %}#}
+{#            </h5>#}
+{#            <ul class="gift-list">#}
+{#                <li>{% trans "Access to exclusive member resources" %}</li>#}
+{#                <li>{% trans "Network with biomedical professionals" %}</li>#}
+{#                <li>{% trans "Discounts on events and conferences" %}</li>#}
+{#                <li>{% trans "Monthly newsletter and updates" %}</li>#}
+{#                <li>{% trans "Priority technical support" %}</li>#}
+{#            </ul>#}
+{#        </div>#}
+{##}
+{#        <!-- Next Steps -->#}
+{#        <div class="mt-4 text-center">#}
+{#            <small class="text-muted">#}
+{#                <i class="fas fa-rocket me-1"></i>#}
+{#                {% trans "Your membership is now active! Start exploring your benefits." %}#}
+{#            </small>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+{##}
+{#<script>#}
+{#document.addEventListener('DOMContentLoaded', function() {#}
+{#    // Create confetti animation#}
+{#    function createConfetti() {#}
+{#        const confettiContainer = document.getElementById('confetti');#}
+{#        const colors = ['#2e7d32', '#4caf50', '#81c784', '#a5d6a7', '#c8e6c9'];#}
+{##}
+{#        for (let i = 0; i < 100; i++) {#}
+{#            const piece = document.createElement('div');#}
+{#            piece.className = 'confetti-piece';#}
+{##}
+{#            // Random properties#}
+{#            const color = colors[Math.floor(Math.random() * colors.length)];#}
+{#            const left = Math.random() * 100;#}
+{#            const animationDelay = Math.random() * 5;#}
+{#            const rotation = Math.random() * 360;#}
+{#            const size = Math.random() * 10 + 5;#}
+{##}
+{#            piece.style.backgroundColor = color;#}
+{#            piece.style.left = `${left}%`;#}
+{#            piece.style.animationDelay = `${animationDelay}s`;#}
+{#            piece.style.transform = `rotate(${rotation}deg)`;#}
+{#            piece.style.width = `${size}px`;#}
+{#            piece.style.height = `${size * 2}px`;#}
+{##}
+{#            // Animation#}
+{#            piece.animate([#}
+{#                { top: '-20px', opacity: 0, transform: `rotate(${rotation}deg) scale(0)` },#}
+{#                { top: '-20px', opacity: 1, transform: `rotate(${rotation}deg) scale(1)`, offset: 0.1 },#}
+{#                { top: '100vh', opacity: 1, transform: `rotate(${rotation + 360}deg) scale(1)` },#}
+{#                { top: '100vh', opacity: 0, transform: `rotate(${rotation + 720}deg) scale(0)` }#}
+{#            ], {#}
+{#                duration: 3000 + Math.random() * 2000,#}
+{#                easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'#}
+{#            });#}
+{##}
+{#            confettiContainer.appendChild(piece);#}
+{##}
+{#            // Remove after animation#}
+{#            setTimeout(() => piece.remove(), 5000);#}
+{#        }#}
+{#    }#}
+{##}
+{#    // Trigger confetti#}
+{#    createConfetti();#}
+{#    setTimeout(createConfetti, 1000);#}
+{##}
+{#    // Animate the success icon#}
+{#    const successIcon = document.querySelector('.success-icon i');#}
+{#    successIcon.animate([#}
+{#        { transform: 'scale(0) rotate(0deg)' },#}
+{#        { transform: 'scale(1.2) rotate(360deg)' },#}
+{#        { transform: 'scale(1) rotate(720deg)' }#}
+{#    ], {#}
+{#        duration: 1000,#}
+{#        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'#}
+{#    });#}
+{##}
+{#    // Add click effect to buttons#}
+{#    document.querySelectorAll('.btn').forEach(button => {#}
+{#        button.addEventListener('click', function() {#}
+{#            this.style.transform = 'scale(0.98)';#}
+{#            setTimeout(() => {#}
+{#                this.style.transform = '';#}
+{#            }, 150);#}
+{#        });#}
+{#    });#}
+{##}
+{#    // Auto-redirect to dashboard after 30 seconds#}
+{#    setTimeout(() => {#}
+{#        const redirectNotice = document.createElement('div');#}
+{#        redirectNotice.className = 'alert alert-info mt-3';#}
+{#        redirectNotice.innerHTML = `#}
+{#            <i class="fas fa-info-circle me-2"></i>#}
+{#            {% trans "You will be redirected to your dashboard in 10 seconds..." %}#}
+{#        `;#}
+{#        document.querySelector('.success-card').appendChild(redirectNotice);#}
+{##}
+{#        setTimeout(() => {#}
+{#            window.location.href = "{% url 'dashboard' %}";#}
+{#        }, 10000);#}
+{#    }, 20000);#}
+{##}
+{#    // Print receipt with custom styling#}
+{#    window.addEventListener('beforeprint', () => {#}
+{#        document.querySelector('.success-card').style.boxShadow = 'none';#}
+{#        document.querySelector('.confetti').style.display = 'none';#}
+{#    });#}
+{##}
+{#    window.addEventListener('afterprint', () => {#}
+{#        document.querySelector('.success-card').style.boxShadow = '';#}
+{#        document.querySelector('.confetti').style.display = '';#}
+{#    });#}
+{#});#}
+{#</script>#}
+{#{% endblock %}#}
+
+
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+        --accent-yellow: #fbbc04;
+    }
+
+    .success-animation {
+        margin: 20px 0;
+    }
+
+    .checkmark-circle {
+        width: 100px;
+        height: 100px;
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        margin: 0 auto;
+    }
+
+    .checkmark-circle .background {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        position: absolute;
+    }
+
+    .checkmark-circle .checkmark {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        display: block;
+        stroke-width: 4;
+        stroke: #fff;
+        stroke-miterlimit: 10;
+        animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+    }
+
+    .checkmark-circle .checkmark-circle-path {
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+
+    .checkmark-circle .checkmark-check {
+        transform-origin: 50% 50%;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+    }
+
+    @keyframes stroke {
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes scale {
+        0%, 100% {
+            transform: none;
+        }
+        50% {
+            transform: scale3d(1.1, 1.1, 1);
+        }
+    }
+
+    @keyframes fill {
+        100% {
+            box-shadow: inset 0px 0px 0px 30px var(--primary-green);
+        }
+    }
+
+    .membership-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin: 30px 0;
+    }
+
+    .membership-card-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .membership-card-body {
+        padding: 30px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        color: var(--medium-gray);
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: var(--dark-gray);
+        font-weight: 600;
+    }
+
+    .btn-download {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+        color: white;
+    }
+
+    .btn-share {
+        background: white;
+        color: var(--primary-green);
+        border: 2px solid var(--primary-green);
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-share:hover {
+        background: var(--primary-green);
+        color: white;
+    }
+
+    .badge-status {
+        background: rgba(46, 125, 50, 0.1);
+        color: var(--primary-green);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .next-steps {
+        background: rgba(46, 125, 50, 0.05);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .next-steps h5 {
+        color: var(--primary-green);
+        margin-bottom: 15px;
+    }
+
+    .next-step-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .next-step-item i {
+        color: var(--primary-green);
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Success Animation -->
+            <div class="text-center success-animation">
+                <div class="checkmark-circle">
+                    <div class="background"></div>
+                    <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="checkmark-circle-path" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                </div>
+                <h2 class="mt-4" style="color: var(--primary-green);">{% trans "Payment Successful!" %}</h2>
+                <p class="text-muted">{% trans "Your membership has been activated successfully." %}</p>
+            </div>
+
+            <!-- Membership Card -->
+            <div class="membership-card">
+                <div class="membership-card-header">
+                    <i class="fas fa-id-card fa-3x mb-3"></i>
+                    <h4 class="mb-0">{{ subscription.membership_plan.name }}</h4>
+                    <p class="mb-0 opacity-90">{{ subscription.get_membership_plan.plan_type_display }}</p>
+                </div>
+                <div class="membership-card-body">
+                    <!-- Status Badge -->
+                    <div class="text-center mb-4">
+                        <span class="badge-status">
+                            <i class="fas fa-check-circle me-1"></i>
+                            {% trans "ACTIVE" %}
+                        </span>
+                    </div>
+
+                    <!-- Member Details -->
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Member Name" %}</span>
+                        <span class="detail-value">{{ subscription.user.get_full_name|default:subscription.user.email }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Membership ID" %}</span>
+                        <span class="detail-value">#{{ subscription.id }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Plan" %}</span>
+                        <span class="detail-value">{{ subscription.membership_plan.name }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Start Date" %}</span>
+                        <span class="detail-value">{{ subscription.start_date|date:"F d, Y" }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Expiry Date" %}</span>
+                        <span class="detail-value">{{ subscription.end_date|date:"F d, Y" }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Amount Paid" %}</span>
+                        <span class="detail-value">{{ subscription.membership_plan.currency }} {{ subscription.amount_paid }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Payment Method" %}</span>
+                        <span class="detail-value">{{ subscription.get_payment_method_display }}</span>
+                    </div>
+
+                    {% if subscription.mobile_number %}
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Mobile Number" %}</span>
+                        <span class="detail-value">{{ subscription.mobile_number }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Transaction ID" %}</span>
+                        <span class="detail-value"><code>{{ subscription.transaction_id }}</code></span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">{% trans "Payment Date" %}</span>
+                        <span class="detail-value">{{ subscription.payment_date|date:"F d, Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="next-steps">
+                <h5><i class="fas fa-rocket me-2"></i>{% trans "Next Steps" %}</h5>
+                <div class="next-step-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{% trans "Check your email for membership confirmation and receipt" %}</span>
+                </div>
+                <div class="next-step-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{% trans "Complete your profile to access all member benefits" %}</span>
+                </div>
+                <div class="next-step-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{% trans "Explore member-only resources and networking opportunities" %}</span>
+                </div>
+                <div class="next-step-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{% trans "Join upcoming webinars and events" %}</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mt-4">
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'dashboard' %}" class="btn-download">
+                        <i class="fas fa-tachometer-alt me-2"></i>{% trans "Go to Dashboard" %}
+                    </a>
+                    <a href="#" class="btn-share" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>{% trans "Print Receipt" %}
+                    </a>
+                </div>
+
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-envelope me-1"></i>
+                        {% trans "A confirmation email has been sent to" %} {{ subscription.user.email }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Support Information -->
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h5 style="color: var(--primary-green);">
+                        <i class="fas fa-headset me-2"></i>{% trans "Questions?" %}
+                    </h5>
+                    <p class="text-muted mb-3">
+                        {% trans "Our support team is here to help you get started." %}
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="mailto:support@abea.org" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-envelope me-2"></i>support@abea.org
+                        </a>
+                        <a href="tel:+260123456789" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-phone me-2"></i>+260 123 456 789
+                        </a>
+                        <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-comments me-2"></i>{% trans "Contact Form" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,414 @@
+<!-- templates/accounts/dashboard.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Dashboard - ABEA" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+    }
+
+    .dashboard-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        height: 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-top: 4px solid transparent;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        display: block;
+    }
+
+    .progress-bar {
+        height: 10px;
+        border-radius: 5px;
+    }
+
+    .profile-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid var(--primary-green);
+    }
+
+    .btn-outline-primary {
+        border-color: var(--primary-green);
+        color: var(--primary-green);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-green);
+        color: white;
+    }
+
+    .section-title {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-bottom: 0.5rem;
+        color: var(--primary-green);
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-green), var(--accent-red));
+        border-radius: 2px;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)) !important;
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #ff9800, #ff5722) !important;
+    }
+
+    .badge-info {
+        background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray)) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-0" style="color: var(--primary-green);">{% trans "Welcome back" %}, {{ user.get_full_name }}!</h1>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            {% now "l, F j, Y" %}
+                        </p>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog me-2"></i>{% trans "Quick Actions" %}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}">
+                                <i class="fas fa-user-edit me-2" style="color: var(--primary-green);"></i>{% trans "Update Profile" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'subscription_history' %}">
+                                <i class="fas fa-receipt me-2" style="color: var(--primary-green);"></i>{% trans "View Subscriptions" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'events_list' %}">
+                                <i class="fas fa-calendar-plus me-2" style="color: var(--accent-red);"></i>{% trans "Browse Events" %}
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'contact' %}">
+                                <i class="fas fa-headset me-2" style="color: var(--accent-red);"></i>{% trans "Get Support" %}
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Summary -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-4">
+                <div class="dashboard-card" style="border-top-color: var(--primary-green);">
+                    <div class="text-center">
+                        {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="profile-img mb-3">
+                        {% else %}
+                        <div class="profile-img d-flex align-items-center justify-content-center mx-auto mb-3"
+                             style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                            <i class="fas fa-user fa-3x text-white"></i>
+                        </div>
+                        {% endif %}
+                        <h4 style="color: var(--primary-green);">{{ user.get_full_name }}</h4>
+                        <p class="text-muted mb-2">{{ user.email }}</p>
+
+                        {% if user.membership_type %}
+                        <span class="badge {% if user.membership_status == 'ACTIVE' %}badge-success{% else %}badge-warning{% endif %} mb-3">
+                            {{ user.get_membership_type_display }} - {{ user.get_membership_status_display }}
+                        </span>
+                        {% endif %}
+
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'profile' %}" class="btn" style="background-color: var(--accent-red); color: white; border: none;">
+                                <i class="fas fa-edit me-2"></i>{% trans "Edit Profile" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="row g-4">
+                    <!-- Membership Status -->
+                    <div class="col-md-6">
+                        <div class="dashboard-card" style="border-top-color: var(--primary-green);">
+                            <h5 class="mb-3" style="color: var(--primary-green);">
+                                <i class="fas fa-id-card me-2"></i>{% trans "Membership Status" %}
+                            </h5>
+
+                            {% if active_subscription %}
+                            <div class="alert" style="background-color: rgba(46, 125, 50, 0.1); border-left: 4px solid var(--primary-green);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ active_subscription.membership_plan.name }}</h6>
+                                        <p class="mb-0 small">
+                                            {% trans "Expires" %}: {{ active_subscription.end_date|date:"M d, Y" }}
+                                        </p>
+                                    </div>
+                                    <span class="badge badge-success">{% trans "ACTIVE" %}</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted d-block mb-1">{% trans "Time until expiry" %}</small>
+                                <div class="progress">
+                                    {% with days_remaining=active_subscription.days_remaining days_total=365 %}
+                                    <div class="progress-bar" role="progressbar" style="width: 70%; background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));"></div>
+                                    {% endwith %}
+                                </div>
+                            </div>
+
+                            <a href="{% url 'membership' %}" class="btn btn-sm" style="background-color: var(--accent-red); color: white; border: none;">
+                                <i class="fas fa-sync-alt me-1"></i>{% trans "Renew Membership" %}
+                            </a>
+                            {% else %}
+                            <div class="alert" style="background-color: rgba(255, 152, 0, 0.1); border-left: 4px solid #ff9800;">
+                                <h6 class="mb-1">{% trans "No Active Membership" %}</h6>
+                                <p class="mb-2 small">{% trans "You don't have an active membership subscription." %}</p>
+                                <a href="{% url 'membership' %}" class="btn btn-sm" style="background-color: var(--primary-green); color: white; border: none;">
+                                    <i class="fas fa-user-plus me-1"></i>{% trans "Subscribe Now" %}
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="col-md-6">
+                        <div class="dashboard-card" style="border-top-color: var(--accent-red);">
+                            <h5 class="mb-3" style="color: var(--accent-red);">
+                                <i class="fas fa-history me-2"></i>{% trans "Recent Activity" %}
+                            </h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item px-0 border-0">
+                                    <small class="text-muted">
+                                        <i class="fas fa-sign-in-alt me-2" style="color: var(--primary-green);"></i>
+                                        {% trans "Last login" %}: {{ user.last_login|timesince }} {% trans "ago" %}
+                                    </small>
+                                </li>
+                                <li class="list-group-item px-0 border-0">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-2" style="color: var(--accent-red);"></i>
+                                        {% trans "Member since" %}: {{ user.date_joined|date:"M d, Y" }}
+                                    </small>
+                                </li>
+                                {% if user.membership_date %}
+                                <li class="list-group-item px-0 border-0">
+                                    <small class="text-muted">
+                                        <i class="fas fa-id-card me-2" style="color: var(--primary-green);"></i>
+                                        {% trans "Membership start" %}: {{ user.membership_date|date:"M d, Y" }}
+                                    </small>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-card" style="border-top-color: var(--primary-green);">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0" style="color: var(--primary-green);">
+                            <i class="fas fa-calendar-alt me-2"></i>{% trans "Upcoming Events" %}
+                        </h5>
+                        <a href="{% url 'events_list' %}" class="btn btn-sm btn-outline-primary">
+                            {% trans "View All" %} <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+
+                    <div class="row g-4">
+                        {% for event in upcoming_events %}
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm h-100" style="border-top: 3px solid var(--primary-green);">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ event.title }}</h6>
+                                    <p class="card-text small text-muted">
+                                        <i class="far fa-calendar me-1"></i>
+                                        {{ event.start_date|date:"M d, Y" }}
+                                    </p>
+                                    <p class="card-text small">
+                                        {{ event.short_description|truncatewords:15 }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge badge-info">{{ event.get_event_type_display }}</span>
+                                        <a href="{% url 'event_detail' event.slug %}" class="btn btn-sm"
+                                           style="background-color: var(--primary-green); color: white; border: none;">
+                                            {% trans "Details" %}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-center py-4">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                                 style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                                <i class="fas fa-calendar-times fa-2x text-white"></i>
+                            </div>
+                            <p class="text-muted">{% trans "No upcoming events scheduled." %}</p>
+                            <a href="{% url 'events_list' %}" class="btn" style="background-color: var(--primary-green); color: white; border: none;">
+                                <i class="fas fa-calendar-alt me-2"></i>{% trans "Browse Events" %}
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Latest News -->
+        <div class="row">
+            <div class="col-12">
+                <div class="dashboard-card" style="border-top-color: var(--accent-red);">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0" style="color: var(--accent-red);">
+                            <i class="fas fa-newspaper me-2"></i>{% trans "Latest News" %}
+                        </h5>
+                        <a href="{% url 'news_list' %}" class="btn btn-sm btn-outline-primary">
+                            {% trans "View All" %} <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+
+                    <div class="row g-4">
+                        {% for news in recent_news %}
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm h-100" style="border-top: 3px solid var(--accent-red);">
+                                {% if news.image %}
+                                <img src="{{ news.image.url }}" class="card-img-top" alt="{{ news.title }}"
+                                     style="height: 150px; object-fit: cover;">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ news.title }}</h6>
+                                    <p class="card-text small text-muted">
+                                        <i class="far fa-clock me-1"></i>
+                                        {{ news.publish_date|timesince }} {% trans "ago" %}
+                                    </p>
+                                    <p class="card-text small">
+                                        {{ news.excerpt|truncatewords:15 }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge" style="background-color: var(--primary-green); color: white;">{{ news.get_category_display }}</span>
+                                        <a href="{% url 'news_detail' news.slug %}" class="btn btn-sm"
+                                           style="background-color: var(--accent-red); color: white; border: none;">
+                                            {% trans "Read" %}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-center py-4">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                                 style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent-red), #f44336);">
+                                <i class="fas fa-newspaper fa-2x text-white"></i>
+                            </div>
+                            <p class="text-muted">{% trans "No recent news articles." %}</p>
+                            <a href="{% url 'news_list' %}" class="btn" style="background-color: var(--accent-red); color: white; border: none;">
+                                <i class="fas fa-book-open me-2"></i>{% trans "Read News" %}
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <span class="stat-number" style="color: var(--primary-green);">0</span>
+                    <p class="text-muted mb-0">{% trans "Events Attended" %}</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, var(--accent-red), #f44336);">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <span class="stat-number" style="color: var(--accent-red);">{% if active_subscription %}1{% else %}0{% endif %}</span>
+                    <p class="text-muted mb-0">{% trans "Active Subscriptions" %}</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray));">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <span class="stat-number" style="color: var(--dark-gray);">{{ user.event_registrations.count }}</span>
+                    <p class="text-muted mb-0">{% trans "Event Registrations" %}</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #ff9800, #ff5722);">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <span class="stat-number" style="color: #ff9800;">0</span>
+                    <p class="text-muted mb-0">{% trans "Connections" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

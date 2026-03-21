@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{% trans "Simulate Credit Card Payment" %}</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>{% trans "Plan:" %}</strong> {{ subscription.membership_plan.name }}</p>
+                    <p><strong>{% trans "Amount:" %}</strong> {{ subscription.membership_plan.currency }} {{ subscription.amount_paid }}</p>
+                    <p><strong>{% trans "Subscription ID:" %}</strong> {{ subscription.id }}</p>
+                    <hr>
+                    <p class="text-center text-muted">{% trans "This is a simulation. Choose an outcome:" %}</p>
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'payment_callback' %}?subscription_id={{ subscription.id }}&status=success&transaction_id=SIM-{{ subscription.id }}" 
+                           class="btn btn-success">
+                            <i class="fas fa-check me-2"></i>{% trans "Simulate Successful Payment" %}
+                        </a>
+                        <a href="{% url 'payment_callback' %}?subscription_id={{ subscription.id }}&status=failure" 
+                           class="btn btn-danger">
+                            <i class="fas fa-times me-2"></i>{% trans "Simulate Failed Payment" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

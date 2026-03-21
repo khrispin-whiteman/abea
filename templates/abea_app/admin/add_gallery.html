@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Add Gallery Image" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); color: white;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>{% trans "Add Gallery Image" %}</h4>
+                        <a href="{% url 'manage_gallery' %}" class="btn btn-sm" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+                            <i class="fas fa-arrow-left me-1"></i> {% trans "Back" %}
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Basic Information -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>{% trans "Image Details" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="{{ form.title.id_for_label }}" class="form-label">{% trans "Title" %} *</label>
+                                        {{ form.title }}
+                                        {% if form.title.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.title.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label for="{{ form.description.id_for_label }}" class="form-label">{% trans "Description" %}</label>
+                                        {{ form.description }}
+                                        {% if form.description.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.description.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.category.id_for_label }}" class="form-label">{% trans "Category" %} *</label>
+                                        {{ form.category }}
+                                        {% if form.category.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.category.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.event.id_for_label }}" class="form-label">{% trans "Associated Event" %}</label>
+                                        {{ form.event }}
+                                        {% if form.event.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.event.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.display_order.id_for_label }}" class="form-label">{% trans "Display Order" %}</label>
+                                        {{ form.display_order }}
+                                        <small class="text-muted">{% trans "Lower numbers display first" %}</small>
+                                        {% if form.display_order.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.display_order.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mt-3">
+                                            {{ form.is_featured }}
+                                            <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+                                                {% trans "Featured Image" %}
+                                            </label>
+                                            <small class="d-block text-muted">{% trans "Highlighted on the gallery page" %}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Media -->
+                        <div class="card mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-green), #2d9249); color: white;">
+                                <h5 class="mb-0"><i class="fas fa-images me-2"></i>{% trans "Media" %}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.image.id_for_label }}" class="form-label">{% trans "Main Image" %} *</label>
+                                        {{ form.image }}
+                                        <div class="image-preview mt-2" id="imagePreview" style="display:none;">
+                                            <img id="previewImage" src="#" alt="Preview" class="img-fluid rounded">
+                                        </div>
+                                        {% if form.image.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.image.errors }}</div>
+                                        {% endif %}
+                                        <small class="text-muted">{% trans "Recommended: 1200x800px" %}</small>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="{{ form.thumbnail.id_for_label }}" class="form-label">{% trans "Thumbnail" %}</label>
+                                        {{ form.thumbnail }}
+                                        <div class="thumbnail-preview mt-2" id="thumbnailPreview" style="display:none;">
+                                            <img id="previewThumbnail" src="#" alt="Thumbnail Preview" class="img-fluid rounded">
+                                        </div>
+                                        {% if form.thumbnail.errors %}
+                                        <div class="text-danger mt-1 small">{{ form.thumbnail.errors }}</div>
+                                        {% endif %}
+                                        <small class="text-muted">{% trans "Optional: 300x200px" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'manage_gallery' %}" class="btn" style="background: linear-gradient(135deg, #6c757d, #495057); border: none; color: white;">
+                                <i class="fas fa-times me-2"></i> {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
+                                <i class="fas fa-save me-2"></i> {% trans "Save Gallery Image" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --dark-red: #b71c1c;
+    }
+
+    .card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+        border-bottom: none;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.75rem;
+    }
+
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+        width: 100%;
+        display: block;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.95rem;
+        transition: all 0.25s ease-in-out;
+        background-color: #fff;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(46,125,50,0.18);
+        outline: none;
+    }
+
+    textarea {
+        min-height: 120px;
+    }
+
+    .form-check.form-switch {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+    .btn {
+        padding: 0.7rem 1.6rem;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.25s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Main image preview
+    const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImage = document.getElementById('previewImage');
+
+    imageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                imagePreview.style.display = 'block';
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    // Thumbnail preview
+    const thumbnailInput = document.getElementById('{{ form.thumbnail.id_for_label }}');
+    const thumbnailPreview = document.getElementById('thumbnailPreview');
+    const previewThumbnail = document.getElementById('previewThumbnail');
+
+    thumbnailInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewThumbnail.src = e.target.result;
+                thumbnailPreview.style.display = 'block';
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+});
+</script>
+{% endblock %}

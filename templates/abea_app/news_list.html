@@ -1,0 +1,255 @@
+<!-- templates/abea_app/news_list.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title|default:"News & Events - ABEA" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #2e7d32;
+        --secondary-green: #4caf50;
+        --accent-red: #d32f2f;
+        --light-gray: #f5f5f5;
+        --medium-gray: #9e9e9e;
+        --dark-gray: #424242;
+    }
+
+    .news-hero {
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-gray) 100%);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    .news-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .news-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .news-category-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 1;
+    }
+
+    .section-title {
+        position: relative;
+        margin-bottom: 3rem;
+        padding-bottom: 1rem;
+        color: var(--primary-green);
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--accent-red));
+        border-radius: 2px;
+    }
+
+    .category-filter .nav-link {
+        color: var(--medium-gray);
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .category-filter .nav-link.active {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+    }
+
+    .category-filter .nav-link:hover:not(.active) {
+        color: var(--primary-green);
+    }
+
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- News Hero -->
+<section class="news-hero">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-4">{% trans "News & Updates" %}</h1>
+        <p class="lead mb-0">
+            {% trans "Stay informed about the latest developments in biomedical engineering across Africa." %}
+        </p>
+    </div>
+</section>
+
+<!-- Category Filter -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="category-filter">
+            <ul class="nav justify-content-center flex-wrap">
+                <li class="nav-item">
+                    <a class="nav-link {% if not selected_category %}active{% endif %}"
+                       href="{% url 'news_list' %}">
+                        {% trans "All News" %}
+                    </a>
+                </li>
+                {% for category_key, category_name in categories %}
+                <li class="nav-item">
+                    <a class="nav-link {% if selected_category == category_key %}active{% endif %}"
+                       href="{% url 'news_list' %}?category={{ category_key }}">
+                        {{ category_name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- News Grid -->
+<section class="py-5">
+    <div class="container">
+        {% if news_list %}
+        <div class="row g-4">
+            {% for news in news_list %}
+            <div class="col-lg-4 col-md-6">
+                <div class="news-card">
+                    <a href="{% url 'news_detail' news.slug %}" class="text-decoration-none text-dark">
+                        <div class="position-relative">
+                            {% if news.image %}
+                            <img src="{{ news.image.url }}" class="card-img-top" alt="{{ news.title }}"
+                                 style="height: 200px; object-fit: cover;">
+                            {% else %}
+                            <div style="height: 200px; background: linear-gradient(135deg, var(--light-gray), var(--medium-gray));
+                                      display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-newspaper fa-3x" style="color: var(--primary-green);"></i>
+                            </div>
+                            {% endif %}
+                            <span class="news-category-badge badge"
+                                  style="background: var(--accent-red);">
+                                {{ news.get_category_display }}
+                            </span>
+                        </div>
+                        <div class="p-4">
+                            <h5 class="mb-2">{{ news.title }}</h5>
+                            <p class="text-muted small mb-3">
+                                <i class="far fa-calendar me-1"></i>
+                                {{ news.publish_date|date:"M d, Y" }}
+                            </p>
+                            <p class="text-muted mb-0">
+                                {{ news.excerpt|default:news.content|truncatewords:20 }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="text-primary small">
+                                    {% trans "Read More" %} <i class="fas fa-arrow-right ms-1"></i>
+                                </span>
+                                <span class="text-muted small">
+                                    <i class="far fa-eye me-1"></i> {{ news.views }}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if news_list.paginator.num_pages > 1 %}
+        <nav aria-label="News pagination" class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if news_list.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ news_list.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                       style="color: var(--primary-green);">
+                        {% trans "Previous" %}
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in news_list.paginator.page_range %}
+                {% if news_list.number == num %}
+                <li class="page-item active">
+                    <span class="page-link" style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); border-color: var(--primary-green);">
+                        {{ num }}
+                    </span>
+                </li>
+                {% elif num > news_list.number|add:-3 and num < news_list.number|add:3 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                       style="color: var(--primary-green);">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if news_list.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ news_list.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                       style="color: var(--primary-green);">
+                        {% trans "Next" %}
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                 style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                <i class="fas fa-newspaper fa-3x text-white"></i>
+            </div>
+            <h4>{% trans "No news articles found" %}</h4>
+            <p class="text-muted">
+                {% if selected_category %}
+                {% trans "No news articles in this category yet. Check back soon!" %}
+                {% else %}
+                {% trans "No news articles published yet. Check back soon!" %}
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-gray) 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="mb-3">{% trans "Stay Updated" %}</h3>
+                <p class="mb-0 opacity-90">
+                    {% trans "Subscribe to our newsletter to receive the latest news and updates directly in your inbox." %}
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="#newsletter" class="btn btn-lg fw-bold"
+                   style="background: linear-gradient(135deg, #ffffff, var(--light-gray)); color: var(--dark-gray);">
+                    <i class="fas fa-envelope me-2"></i>{% trans "Subscribe" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

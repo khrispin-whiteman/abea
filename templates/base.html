@@ -1,0 +1,469 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="{{ request.LANGUAGE_CODE|default:'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>{% block title %}Africa Biomedical Engineering Alliance{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Owl Carousel -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <style>
+        /* NAVBAR VISIBILITY FIX ONLY */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-red) 100%) !important;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand,
+        .navbar-nav .nav-link,
+        .navbar-nav .dropdown-toggle,
+        .navbar-nav .btn {
+            color: white !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .dropdown-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+            font-weight: 600;
+            border-bottom: 3px solid white;
+        }
+
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Mobile menu */
+        @media (max-width: 991.98px) {
+            .navbar-nav {
+                padding: 1rem 0;
+            }
+
+            .navbar-nav .nav-link {
+                padding: 0.8rem 1rem !important;
+            }
+
+            .navbar-nav .btn {
+                margin-top: 0.5rem;
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Language Switcher -->
+    <div class="language-switcher" style="background: linear-gradient(90deg, var(--primary-green), var(--accent-red)); color: white;">
+        <div class="container">
+            <div class="d-flex justify-content-end">
+                <form action="{% url 'set_language' %}" method="post" class="language-form">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ redirect_to }}">
+                    <select name="language" class="form-select form-select-sm bg-transparent text-white border-white" style="width: auto;">
+                        <option value="" class="text-dark">🌍 {% trans "Language" %}</option>
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% get_available_languages as LANGUAGES %}
+                        {% get_language_info_list for LANGUAGES as languages %}
+                        {% for language in languages %}
+                            <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}selected{% endif %} class="text-dark">
+                                {{ language.name_local }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <div class="d-flex align-items-center">
+                    <div class="logo-container">
+                        <img src="{% static 'img/logo.png' %}" alt="ABEA Logo" class="img-fluid" style="max-height: 50px;">
+                    </div>
+                    <div class="ms-3 d-none d-md-block">
+                        <div class="text-white fw-bold" style="font-size: 1.2rem; line-height: 1.1;">
+                            <small>Africa Biomedical</small>
+                            <br>
+                            <small>Engineering Alliance</small>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item mx-1">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
+                            <i class="fas fa-home me-1"></i>{% trans "Home" %}
+                        </a>
+                    </li>
+
+                    <!-- About Us Dropdown (replaces simple link and Governance) -->
+                    <li class="nav-item dropdown mx-1">
+                        <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name in 'about,executive_members,all_members' %}active{% endif %}" href="#"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-info-circle me-1"></i>{% trans "About Us" %}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'about' %}">
+                                    <i class="fas fa-info-circle me-2" style="color: var(--primary-green);"></i>
+                                    {% trans "About Us" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'executive_members' %}">
+                                    <i class="fas fa-user-tie me-2" style="color: var(--primary-green);"></i>
+                                    {% trans "Executive Committee" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'all_members' %}">
+                                    <i class="fas fa-users me-2" style="color: var(--primary-green);"></i>
+                                    {% trans "All Members" %}
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown mx-1">
+                        <a class="nav-link dropdown-toggle {% if '/news/' in request.path or '/events/' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-newspaper me-1"></i>{% trans "News & Events" %}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'news_list' %}">{% trans "Latest News" %}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'events_list' %}">{% trans "Events Calendar" %}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'gallery' %}">{% trans "Gallery" %}</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link {% if '/membership/' in request.path %}active{% endif %}" href="{% url 'membership' %}">
+                            <i class="fas fa-users me-1"></i>{% trans "Membership" %}
+                        </a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link {% if '/contact/' in request.path %}active{% endif %}" href="{% url 'contact' %}">
+                            <i class="fas fa-envelope me-1"></i>{% trans "Contact Us" %}
+                        </a>
+                    </li>
+
+                    {% if user.is_superuser %}
+                    <li class="nav-item dropdown mx-1">
+                        <a class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog me-1"></i> {% trans "Admin" %}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-2" style="color: var(--primary-green);"></i>{% trans "Dashboard" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'manage_users' %}">
+                                <i class="fas fa-users-cog me-2" style="color: var(--primary-green);"></i>{% trans "Manage Users" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'manage_events' %}">
+                                <i class="fas fa-calendar-alt me-2" style="color: var(--primary-green);"></i>{% trans "Manage Events" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'manage_news' %}">
+                                <i class="fas fa-newspaper me-2" style="color: var(--primary-green);"></i>{% trans "Manage News" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'manage_partners' %}" class="btn btn-warning">
+                                <i class="fas fa-handshake me-2" style="color: var(--primary-green);"></i> {% trans "Manage Partners" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'manage_executive_members' %}" class="btn btn-dark">
+                                <i class="fas fa-user-tie me-2" style="color: var(--primary-green);"></i> {% trans "Manage Executives" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'manage_gallery' %}" class="btn btn-secondary">
+                                <i class="fas fa-images me-2" style="color: var(--primary-green);"></i> {% trans "Manage Gallery" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'manage_membership_plans' %}" class="btn btn-secondary">
+                                <i class="fas fa-users me-2" style="color: var(--primary-green);"></i> {% trans "Manage Membership Plans" %}
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank">
+                                <i class="fas fa-shield-alt me-2" style="color: var(--accent-red);"></i>{% trans "Django Admin" %}
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <ul class="navbar-nav ms-3">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 2px solid white;">
+                            {% else %}
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: rgba(255,255,255,0.2);">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            {% endif %}
+                            <span class="d-none d-md-inline">{{ user.get_short_name|default:user.email }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-2" style="color: var(--primary-green);"></i>{% trans "Dashboard" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'profile' %}">
+                                <i class="fas fa-user me-2" style="color: var(--primary-green);"></i>{% trans "My Profile" %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'subscription_history' %}">
+                                <i class="fas fa-receipt me-2" style="color: var(--accent-red);"></i>{% trans "Subscription History" %}
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt me-2" style="color: var(--accent-red);"></i>{% trans "Logout" %}
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item mx-1">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-1"></i>{% trans "Login" %}
+                        </a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="btn fw-bold" href="{% url 'register' %}">
+                            <i class="fas fa-user-plus me-1"></i>{% trans "Register" %}
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert"
+             style="border-left: 5px solid {% if message.tags == 'success' %}var(--primary-green){% elif message.tags == 'error' %}var(--accent-red){% elif message.tags == 'warning' %}var(--dark-red){% else %}var(--medium-gray){% endif %};">
+            {% if message.tags == 'success' %}
+            <i class="fas fa-check-circle me-2" style="color: var(--primary-green);"></i>
+            {% elif message.tags == 'error' %}
+            <i class="fas fa-exclamation-circle me-2" style="color: var(--accent-red);"></i>
+            {% elif message.tags == 'warning' %}
+            <i class="fas fa-exclamation-triangle me-2" style="color: var(--dark-red);"></i>
+            {% elif message.tags == 'info' %}
+            <i class="fas fa-info-circle me-2" style="color: var(--medium-gray);"></i>
+            {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-5" style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-gray) 100%); color: white;">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="logo-container mb-3">
+                        <img src="{% static 'img/logo.png' %}" alt="ABEA Logo" class="img-fluid" style="max-height: 50px;">
+                    </div>
+                    <h5 class="mb-3">{% trans "Africa Biomedical Engineering Alliance" %}</h5>
+                    <p class="text-white-50">
+                        {% trans "Uniting and empowering biomedical engineering professionals across Africa for better healthcare." %}
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="text-white me-3" title="Facebook" style="background-color: blue; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-white me-3" title="X" style="background-color: black; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;">
+                            <i class="fab fa-x"></i>
+                        </a>
+                        <a href="#" class="text-white me-3" title="LinkedIn" style="background-color: darkblue; width: 36px; height: 36px; display: inline-flex; align-items center; justify-content: center; border-radius: 50%;">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="text-white" title="YouTube" style="background-color: var(--accent-red); width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="mb-3">{% trans "Quick Links" %}</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'home' %}" class="text-white-50 text-decoration-none">
+                                <i class="fas fa-chevron-right me-2" style="color: var(--accent-red);"></i>{% trans "Home" %}
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'about' %}" class="text-white-50 text-decoration-none">
+                                <i class="fas fa-chevron-right me-2" style="color: var(--accent-red);"></i>{% trans "About Us" %}
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'news_list' %}" class="text-white-50 text-decoration-none">
+                                <i class="fas fa-chevron-right me-2" style="color: var(--accent-red);"></i>{% trans "News" %}
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'events_list' %}" class="text-white-50 text-decoration-none">
+                                <i class="fas fa-chevron-right me-2" style="color: var(--accent-red);"></i>{% trans "Events" %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'membership' %}" class="text-white-50 text-decoration-none">
+                                <i class="fas fa-chevron-right me-2" style="color: var(--accent-red);"></i>{% trans "Membership" %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">{% trans "Contact Info" %}</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-envelope me-2" style="color: var(--accent-red);"></i>
+                            <a href="mailto:africabmealliance24@gmail.com" class="text-white-50 text-decoration-none">
+                                africabmealliance24@gmail.com
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2" style="color: var(--accent-red);"></i>
+                            <span class="text-white-50">+254 723 320894</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2" style="color: var(--accent-red);"></i>
+                            <span class="text-white-50">+260 977 140005</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt me-2" style="color: var(--accent-red);"></i>
+                            <span class="text-white-50">{% trans "Pan-African Organization" %}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">{% trans "Newsletter" %}</h5>
+                    <p class="text-white-50">{% trans "Subscribe to our newsletter for updates." %}</p>
+                    <form id="newsletterForm" class="d-flex">
+                        {% csrf_token %}
+                        <input type="email" class="form-control me-2" placeholder="{% trans 'Your email' %}" required>
+                        <button type="submit" class="btn" style="background-color: var(--accent-red); border-color: var(--accent-red); color: white;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <hr class="bg-light">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0 text-white-50">
+                        © {% now "Y" %} {% trans "Africa Biomedical Engineering Alliance. All rights reserved." %}
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white-50 text-decoration-none me-3">
+                        <i class="fas fa-shield-alt me-1" style="color: var(--accent-red);"></i>{% trans "Privacy Policy" %}
+                    </a>
+                    <a href="#" class="text-white-50 text-decoration-none">
+                        <i class="fas fa-file-contract me-1" style="color: var(--accent-red);"></i>{% trans "Terms of Service" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+    <!-- CSRF Token for AJAX -->
+    <script>
+        const csrftoken = '{{ csrf_token }}';
+
+        // Language switcher auto-submit
+        document.querySelector('.language-form select').addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Newsletter form submission
+        $('#newsletterForm').submit(function(e) {
+            e.preventDefault();
+            const email = $(this).find('input[type="email"]').val();
+
+            $.ajax({
+                url: '/api/newsletter-subscribe/',
+                method: 'POST',
+                data: {
+                    email: email,
+                    csrfmiddlewaretoken: csrftoken
+                },
+                success: function(response) {
+                    $('#newsletterForm').before(
+                        '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                        '<i class="fas fa-check-circle me-2" style="color: var(--primary-green);"></i>' +
+                        '{% trans "Thank you for subscribing!" %}' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>'
+                    );
+                    $('#newsletterForm')[0].reset();
+                },
+                error: function() {
+                    $('#newsletterForm').before(
+                        '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                        '<i class="fas fa-exclamation-circle me-2" style="color: var(--accent-red);"></i>' +
+                        '{% trans "Subscription failed. Please try again." %}' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>'
+                    );
+                }
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

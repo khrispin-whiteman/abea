@@ -1,0 +1,106 @@
+<!-- templates/accounts/login.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Login - ABEA" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow border-0" style="border-top: 4px solid var(--primary-green);">
+                <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));">
+                    <h3 class="mb-0">
+                        <i class="fas fa-sign-in-alt me-2"></i>{% trans "Member Login" %}
+                    </h3>
+                    <p class="mb-0 mt-2">{% trans "Access your ABEA accounts" %}</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-2" style="color: var(--primary-green);"></i>{% trans "Username" %}
+                            </label>
+                            <input type="text" class="form-control" id="email" name="email"
+                                   placeholder="{% trans 'Enter your username' %}" required
+                                   style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem 1rem;">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2" style="color: var(--primary-green);"></i>{% trans "Password" %}
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="{% trans 'Enter your password' %}" required
+                                       style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem 1rem;">
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()"
+                                        style="border: 2px solid #e9ecef; border-left: none;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="text-end mt-2">
+                                <a href="{% url 'password_reset' %}" class="text-decoration-none small" style="color: var(--accent-red);">
+                                    {% trans "Forgot password?" %}
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">
+                                {% trans "Remember me" %}
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-lg"
+                                    style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); color: white; border: none; padding: 12px 30px; font-weight: 600; border-radius: 30px;">
+                                <i class="fas fa-sign-in-alt me-2"></i>{% trans "Login" %}
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <p class="mb-2">{% trans "Don't have an accounts?" %}</p>
+                            <a href="{% url 'register' %}" class="btn"
+                               style="background-color: var(--accent-red); color: white; border: none; padding: 10px 25px; font-weight: 600; border-radius: 30px;">
+                                <i class="fas fa-user-plus me-2"></i>{% trans "Create Account" %}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4 border-0 shadow-sm" style="border-top: 4px solid var(--accent-red);">
+                <div class="card-body text-center">
+                    <h5 class="mb-3" style="color: var(--primary-green);">{% trans "Quick Access" %}</h5>
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary me-2"
+                       style="border-color: var(--primary-green); color: var(--primary-green);">
+                        <i class="fas fa-home me-1"></i>{% trans "Home" %}
+                    </a>
+                    <a href="{% url 'contact' %}" class="btn btn-outline-secondary"
+                       style="border-color: var(--accent-red); color: var(--accent-red);">
+                        <i class="fas fa-question-circle me-1"></i>{% trans "Help" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePassword() {
+        const passwordField = document.getElementById('password');
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+    }
+
+    // Auto-focus on email field
+    document.getElementById('email').focus();
+</script>
+{% endblock %}
