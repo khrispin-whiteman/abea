@@ -163,19 +163,22 @@ LOCALE_PATHS = [
     BASE_DIR / "locale",   # project-wide translations
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -197,7 +200,7 @@ DEFAULT_FROM_EMAIL = 'Africa Biomedical Engineering Alliance <noreply@dataidafri
 
 # Site information for password reset emails
 SITE_NAME = "Africa Biomedical Engineering Alliance"
-DOMAIN = "localhost:8000"  # Change to your actual domain in production
+DOMAIN = "abea1.org"  # Change to your actual domain in production
 SITE_ID = 1
 
 # Optional: Email timeout
@@ -260,5 +263,7 @@ PESAPAL_TRANSACTION_DEFAULT_REDIRECT_URL = 'membership'
 
 #Add your ngrok URL to CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = [
-    "https://ba47-45-215-236-194.ngrok-free.app",  # your ngrok URL
+    "https://abea1.onrender.com",
+    "https://abea1.org",
+    "https://www.abea1.org",
 ]
