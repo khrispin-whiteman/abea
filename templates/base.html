@@ -1,5 +1,7 @@
 {% load static %}
 {% load i18n %}
+{% load language_tags %}
+
 <!DOCTYPE html>
 <html lang="{{ request.LANGUAGE_CODE|default:'en' }}">
 <head>
@@ -23,7 +25,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
     <style>
-        /* NAVBAR VISIBILITY FIX ONLY */
+        /* NAVBAR */
         .navbar {
             background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-red) 100%) !important;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
@@ -54,8 +56,123 @@
             border-color: rgba(255, 255, 255, 0.5);
         }
 
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
         .navbar-toggler-icon {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .navbar-brand {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0;
+            max-width: calc(100% - 70px);
+            text-decoration: none;
+        }
+
+        .logo-container {
+            width: 50px;
+            height: 50px;
+            min-width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .site-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            max-width: none;
+        }
+
+        .site-title-wrapper {
+            line-height: 1;
+            min-width: 0;
+        }
+
+        .site-title {
+            font-size: 1.2rem;
+            line-height: 1.1;
+            margin: 0;
+            white-space: normal;
+        }
+
+        .site-title-mobile {
+            display: none;
+        }
+
+        .site-title-desktop {
+            display: block;
+        }
+
+        /* Language switcher */
+        .language-switcher-bar {
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-red));
+            color: white;
+            position: relative;
+            z-index: 1031;
+        }
+
+        .language-dropdown-btn {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            padding: 0.4rem 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: all 0.25s ease;
+        }
+
+        .language-dropdown-btn:hover,
+        .language-dropdown-btn:focus {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.55);
+            box-shadow: none;
+        }
+
+        .language-dropdown-menu {
+            border: 0;
+            border-radius: 14px;
+            padding: 0.5rem;
+            min-width: 200px;
+        }
+
+        .language-option {
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .language-option.active,
+        .language-option:hover {
+            background: rgba(25, 135, 84, 0.1);
+            color: var(--primary-green);
+        }
+
+        /* Auth user area */
+        .user-dropdown-toggle {
+            border-radius: 999px;
+            padding: 0.35rem 0.75rem !important;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .user-name {
+            display: inline-block;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
         }
 
         /* Mobile menu */
@@ -73,6 +190,81 @@
                 width: 100%;
                 text-align: center;
             }
+
+            .navbar-collapse {
+                margin-top: 0.75rem;
+            }
+
+            .user-mobile-wrapper {
+                margin-top: 0.75rem;
+            }
+
+            .user-dropdown-toggle {
+                width: 100%;
+                justify-content: flex-start !important;
+                padding: 0.75rem 1rem !important;
+            }
+
+            .user-name {
+                max-width: 220px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .language-dropdown-btn {
+                padding: 0.35rem 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .logo-container {
+                width: 42px;
+                height: 42px;
+                min-width: 42px;
+            }
+
+            .site-logo {
+                width: 42px;
+                height: 42px;
+            }
+
+            .site-title {
+                font-size: 0.78rem;
+                line-height: 1.05;
+            }
+
+            .site-title-mobile {
+                display: block;
+            }
+
+            .site-title-desktop {
+                display: none;
+            }
+
+            .site-title-wrapper {
+                margin-left: 0.5rem !important;
+                max-width: 190px;
+            }
+
+            .user-name {
+                display: inline-block !important;
+                max-width: 150px;
+                font-size: 0.92rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .site-title-wrapper {
+                max-width: 150px;
+            }
+
+            .site-title {
+                font-size: 0.68rem;
+            }
+
+            .user-name {
+                max-width: 110px;
+                font-size: 0.85rem;
+            }
         }
     </style>
 
@@ -80,24 +272,34 @@
 </head>
 <body>
     <!-- Language Switcher -->
-    <div class="language-switcher" style="background: linear-gradient(90deg, var(--primary-green), var(--accent-red)); color: white;">
+    <div class="language-switcher-bar">
         <div class="container">
-            <div class="d-flex justify-content-end">
-                <form action="{% url 'set_language' %}" method="post" class="language-form">
-                    {% csrf_token %}
-                    <input name="next" type="hidden" value="{{ redirect_to }}">
-                    <select name="language" class="form-select form-select-sm bg-transparent text-white border-white" style="width: auto;">
-                        <option value="" class="text-dark">🌍 {% trans "Language" %}</option>
-                        {% get_current_language as LANGUAGE_CODE %}
-                        {% get_available_languages as LANGUAGES %}
-                        {% get_language_info_list for LANGUAGES as languages %}
-                        {% for language in languages %}
-                            <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}selected{% endif %} class="text-dark">
-                                {{ language.name_local }}
-                            </option>
+            <div class="d-flex justify-content-end align-items-center py-2">
+                <div class="dropdown">
+                    <button class="btn language-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="me-2">{{ current_language_meta.flag }}</span>
+                        <span class="me-1 d-none d-sm-inline">{{ current_language_meta.native_name }}</span>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end language-dropdown-menu shadow">
+                        {% for lang in language_switcher_languages %}
+                            {% switch_language_path request.path lang.code as lang_path %}
+                            <li>
+                                <form action="{% url 'set_language' %}" method="post" class="m-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="language" value="{{ lang.code }}">
+                                    <input type="hidden" name="next" value="{{ lang_path }}">
+                                    <button
+                                        type="submit"
+                                        class="dropdown-item language-option {% if lang.code == current_language_meta.code %}active{% endif %}">
+                                        <span class="me-2">{{ lang.flag }}</span>
+                                        <span>{{ lang.native_name }}</span>
+                                    </button>
+                                </form>
+                            </li>
                         {% endfor %}
-                    </select>
-                </form>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -105,22 +307,34 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <div class="d-flex align-items-center">
-                    <div class="logo-container">
-                        <img src="{% static 'img/logo.png' %}" alt="ABEA Logo" class="img-fluid" style="max-height: 50px;">
-                    </div>
-                    <div class="ms-3 d-none d-md-block">
-                        <div class="text-white fw-bold" style="font-size: 1.2rem; line-height: 1.1;">
-                            <small>Africa Biomedical</small>
-                            <br>
+
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                {% static 'img/logo.png' as site_logo %}
+
+                <div class="logo-container flex-shrink-0">
+                    <img
+                        src="{{ site_logo }}"
+                        alt="ABEA Logo"
+                        width="50"
+                        height="50"
+                        class="site-logo"
+                    >
+                </div>
+
+                <div class="ms-2 ms-md-3 site-title-wrapper">
+                    <div class="text-white fw-bold site-title">
+                        <span class="site-title-mobile">
+                            Africa Biomedical<br>Engineering Alliance
+                        </span>
+                        <span class="site-title-desktop">
+                            <small>Africa Biomedical</small><br>
                             <small>Engineering Alliance</small>
-                        </div>
+                        </span>
                     </div>
                 </div>
             </a>
 
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -132,7 +346,6 @@
                         </a>
                     </li>
 
-                    <!-- About Us Dropdown (replaces simple link and Governance) -->
                     <li class="nav-item dropdown mx-1">
                         <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name in 'about,executive_members,all_members' %}active{% endif %}" href="#"
                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -170,11 +383,13 @@
                             <li><a class="dropdown-item" href="{% url 'gallery' %}">{% trans "Gallery" %}</a></li>
                         </ul>
                     </li>
+
                     <li class="nav-item mx-1">
                         <a class="nav-link {% if '/membership/' in request.path %}active{% endif %}" href="{% url 'membership' %}">
                             <i class="fas fa-users me-1"></i>{% trans "Membership" %}
                         </a>
                     </li>
+
                     <li class="nav-item mx-1">
                         <a class="nav-link {% if '/contact/' in request.path %}active{% endif %}" href="{% url 'contact' %}">
                             <i class="fas fa-envelope me-1"></i>{% trans "Contact Us" %}
@@ -199,16 +414,16 @@
                             <li><a class="dropdown-item" href="{% url 'manage_news' %}">
                                 <i class="fas fa-newspaper me-2" style="color: var(--primary-green);"></i>{% trans "Manage News" %}
                             </a></li>
-                            <li><a class="dropdown-item" href="{% url 'manage_partners' %}" class="btn btn-warning">
+                            <li><a class="dropdown-item" href="{% url 'manage_partners' %}">
                                 <i class="fas fa-handshake me-2" style="color: var(--primary-green);"></i> {% trans "Manage Partners" %}
                             </a></li>
-                            <li><a class="dropdown-item" href="{% url 'manage_executive_members' %}" class="btn btn-dark">
+                            <li><a class="dropdown-item" href="{% url 'manage_executive_members' %}">
                                 <i class="fas fa-user-tie me-2" style="color: var(--primary-green);"></i> {% trans "Manage Executives" %}
                             </a></li>
-                            <li><a class="dropdown-item" href="{% url 'manage_gallery' %}" class="btn btn-secondary">
+                            <li><a class="dropdown-item" href="{% url 'manage_gallery' %}">
                                 <i class="fas fa-images me-2" style="color: var(--primary-green);"></i> {% trans "Manage Gallery" %}
                             </a></li>
-                            <li><a class="dropdown-item" href="{% url 'manage_membership_plans' %}" class="btn btn-secondary">
+                            <li><a class="dropdown-item" href="{% url 'manage_membership_plans' %}">
                                 <i class="fas fa-users me-2" style="color: var(--primary-green);"></i> {% trans "Manage Membership Plans" %}
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
@@ -220,19 +435,20 @@
                     {% endif %}
                 </ul>
 
-                <ul class="navbar-nav ms-3">
+                <ul class="navbar-nav ms-lg-3 user-mobile-wrapper">
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center user-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 2px solid white;">
+                                <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name|default:user.email }}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 2px solid white;">
                             {% else %}
-                            <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: rgba(255,255,255,0.2);">
-                                <i class="fas fa-user text-white"></i>
-                            </div>
+                                <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: rgba(255,255,255,0.2);">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
                             {% endif %}
-                            <span class="d-none d-md-inline">{{ user.get_short_name|default:user.email }}</span>
+                            <span class="user-name">{{ user.get_short_name|default:user.email }}</span>
                         </a>
+
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{% url 'dashboard' %}">
                                 <i class="fas fa-tachometer-alt me-2" style="color: var(--primary-green);"></i>{% trans "Dashboard" %}
@@ -312,7 +528,7 @@
                         <a href="#" class="text-white me-3" title="X" style="background-color: black; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;">
                             <i class="fab fa-x"></i>
                         </a>
-                        <a href="#" class="text-white me-3" title="LinkedIn" style="background-color: darkblue; width: 36px; height: 36px; display: inline-flex; align-items center; justify-content: center; border-radius: 50%;">
+                        <a href="#" class="text-white me-3" title="LinkedIn" style="background-color: darkblue; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
                         <a href="#" class="text-white" title="YouTube" style="background-color: var(--accent-red); width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;">
@@ -417,11 +633,6 @@
     <!-- CSRF Token for AJAX -->
     <script>
         const csrftoken = '{{ csrf_token }}';
-
-        // Language switcher auto-submit
-        document.querySelector('.language-form select').addEventListener('change', function() {
-            this.closest('form').submit();
-        });
 
         // Initialize tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
