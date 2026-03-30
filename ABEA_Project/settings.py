@@ -32,7 +32,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['abea1.onrender.com', 'abea1.org', 'www.abea1.org', '127.0.0.1']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -202,6 +201,25 @@ DEFAULT_FROM_EMAIL = 'Africa Biomedical Engineering Alliance <noreply@dataidafri
 SITE_NAME = "Africa Biomedical Engineering Alliance"
 DOMAIN = "abea1.org"  # Change to your actual domain in production
 SITE_ID = 1
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': '/path/to/django-error.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
 
 # Optional: Email timeout
 EMAIL_TIMEOUT = 30
