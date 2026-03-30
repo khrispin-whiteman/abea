@@ -32,6 +32,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['abea1.onrender.com', 'abea1.org', 'www.abea1.org', '127.0.0.1']
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 
 INSTALLED_APPS = [
