@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-tcrfwn1$fd%#o_+e$5!5*r!rkq8y!h%$9%8&5#pzq2+r2u)yh_"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['abea1.onrender.com', 'abea1.org', 'www.abea1.org', '127.0.0.1']
 
@@ -193,8 +193,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # or your email provider
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'chrispinkay@gmail.com'
-EMAIL_HOST_PASSWORD = 'eqax bezc naud erwn'  # Use app password, not regular password
+EMAIL_HOST_USER = 'africabmealliance24@gmail.com'
+EMAIL_HOST_PASSWORD = 'hqxi ngpd vmhy tvbh'  # Use app password, not regular password
 DEFAULT_FROM_EMAIL = 'Africa Biomedical Engineering Alliance <noreply@dataidafrica.com>'
 
 

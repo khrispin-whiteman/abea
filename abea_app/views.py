@@ -2522,7 +2522,7 @@ def register_ipn(request):
         "Content-Type": "application/json"
     }
     payload = {
-        "url": "https://19dd-41-63-16-65.ngrok-free.app/pesapal/ipn/",  # your public IPN endpoint
+        "url": "https://www.abea1.org/pesapal/ipn/",  # your public IPN endpoint
         "ipn_notification_type": "GET"
     }
 
