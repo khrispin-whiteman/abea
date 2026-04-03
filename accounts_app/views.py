@@ -72,6 +72,8 @@ def dashboard_view(request):
     return render(request, 'accounts_app/dashboard.html', context)
 
 
+
+
 @login_required
 def profile_view(request):
     """View for user's own profile (read-only)"""

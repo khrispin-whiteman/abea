@@ -17,6 +17,7 @@ class CustomUserAdmin(UserAdmin):
         (None, {'fields': ('email', 'password')}),
         (_('Personal Info'), {'fields': ('title', 'first_name', 'last_name', 'profile_picture', 'bio')}),
         (_('Contact Info'), {'fields': ('phone', 'country', 'city', 'address')}),
+        (_('Social Media'), {'fields': ('facebook_url', 'linkedin_url', 'x_url')}),
         (_('Professional Info'), {'fields': ('professional_id', 'specialization', 'institution', 'position')}),
         (_('Membership'), {'fields': ('membership_type', 'membership_status',
                                       'membership_date', 'membership_expiry')}),

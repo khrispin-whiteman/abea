@@ -153,6 +153,7 @@ class UserForm(forms.ModelForm):
             'email', 'first_name', 'last_name', 'title', 'phone',
             'professional_id', 'specialization', 'institution', 'position',
             'country', 'city', 'address', 'profile_picture', 'bio',
+            'facebook_url', 'linkedin_url', 'x_url',
             'membership_type', 'membership_status', 'membership_date',
             'membership_expiry', 'payment_method', 'language', 'is_verified',
             'is_active', 'is_staff', 'is_superuser'
@@ -174,6 +175,9 @@ class UserForm(forms.ModelForm):
             'country': forms.TextInput(attrs={'class': 'form-control'}),
             'city': forms.TextInput(attrs={'class': 'form-control'}),
             'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+            'facebook_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://facebook.com/username'}),
+            'linkedin_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://linkedin.com/in/username'}),
+            'x_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://x.com/username'}),
             'membership_type': forms.Select(attrs={'class': 'form-control'}),
             'membership_status': forms.Select(attrs={'class': 'form-control'}),
             'payment_method': forms.TextInput(attrs={'class': 'form-control'}),
@@ -200,6 +204,9 @@ class UserForm(forms.ModelForm):
     def save(self, commit=True):
         # Get the user instance
         user = super().save(commit=False)
+
+        for field_name in User.SOCIAL_FIELDS:
+            setattr(user, field_name, self.cleaned_data.get(field_name) or None)
 
         # Set username to email
         if user.email:

@@ -67,7 +67,7 @@ def home_view(request):
     ).order_by('-publish_date')[:6]
 
     # Get executive members for homepage
-    executive_members = ExecutiveMember.objects.filter(
+    executive_members = ExecutiveMember.objects.select_related('user').filter(
         is_current=True,
         show_on_homepage=True
     ).order_by('display_order')[:4]
@@ -126,7 +126,7 @@ def about_view(request):
     ]
 
     # Get all executive members for about page
-    executive_members = ExecutiveMember.objects.filter(
+    executive_members = ExecutiveMember.objects.select_related('user').filter(
         is_current=True
     ).order_by('position')
 
@@ -1348,7 +1348,7 @@ def toggle_plan_popular_view(request, pk):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def executive_members(request):
-    exec_members = ExecutiveMember.objects.all()
+    exec_members = ExecutiveMember.objects.select_related('user').all()
     return render(request, 'abea_app/executive_members.html',
                   {
                       'exec_members': exec_members,

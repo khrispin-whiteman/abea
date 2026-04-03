@@ -4,6 +4,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 class CustomUser(AbstractUser):
+    SOCIAL_FIELDS = ('facebook_url', 'linkedin_url', 'x_url')
+
     # Override email field to make it unique and required
     email = models.EmailField(
         _('email address'),
@@ -44,6 +46,9 @@ class CustomUser(AbstractUser):
     # Profile
     profile_picture = models.ImageField(_('Profile Picture'), upload_to='profile_pics/', blank=True)
     bio = models.TextField(_('Biography'), blank=True)
+    facebook_url = models.URLField(_('Facebook URL'), blank=True, null=True)
+    linkedin_url = models.URLField(_('LinkedIn URL'), blank=True, null=True)
+    x_url = models.URLField(_('X URL'), blank=True, null=True)
 
     # Membership Information
     membership_type = models.CharField(_('Membership Type'), max_length=50, blank=True,
@@ -78,6 +83,10 @@ class CustomUser(AbstractUser):
         verbose_name_plural = _('Users')
 
     def save(self, *args, **kwargs):
+        for field_name in self.SOCIAL_FIELDS:
+            if not getattr(self, field_name):
+                setattr(self, field_name, None)
+
         # Automatically set username to email if not provided
         if not self.username and self.email:
             self.username = self.email

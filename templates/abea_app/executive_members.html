@@ -100,8 +100,12 @@
         background: #0077b5;
     }
 
-    .exec-social .twitter {
-        background: #1da1f2;
+    .exec-social .facebook {
+        background: #1877f2;
+    }
+
+    .exec-social .x {
+        background: #111111;
     }
 
     .exec-social a:hover {
@@ -236,16 +240,21 @@
                         </div>
 
                         <!-- Social links -->
-                        {% if member.linkedin or member.twitter %}
+                        {% if member.user.facebook_url or member.user.linkedin_url or member.user.x_url or member.linkedin or member.twitter %}
                         <div class="exec-social">
-                            {% if member.linkedin %}
-                            <a href="{{ member.linkedin }}" target="_blank" class="linkedin" title="LinkedIn">
+                            {% if member.user.facebook_url %}
+                            <a href="{{ member.user.facebook_url }}" target="_blank" rel="noopener noreferrer" class="facebook" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            {% endif %}
+                            {% if member.user.linkedin_url or member.linkedin %}
+                            <a href="{{ member.user.linkedin_url|default:member.linkedin }}" target="_blank" rel="noopener noreferrer" class="linkedin" title="LinkedIn">
                                 <i class="fab fa-linkedin-in"></i>
                             </a>
                             {% endif %}
-                            {% if member.twitter %}
-                            <a href="{{ member.twitter }}" target="_blank" class="twitter" title="Twitter">
-                                <i class="fab fa-twitter"></i>
+                            {% if member.user.x_url or member.twitter %}
+                            <a href="{{ member.user.x_url|default:member.twitter }}" target="_blank" rel="noopener noreferrer" class="x" title="X">
+                                <i class="fa-brands fa-x-twitter"></i>
                             </a>
                             {% endif %}
                         </div>

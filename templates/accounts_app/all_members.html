@@ -119,6 +119,43 @@
         width: 16px;
     }
 
+    .member-social {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .member-social-link {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-decoration: none;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .member-social-link:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+        color: white;
+    }
+
+    .member-social-facebook {
+        background: #1877f2;
+    }
+
+    .member-social-linkedin {
+        background: #0077b5;
+    }
+
+    .member-social-x {
+        background: #111111;
+    }
+
     .btn-profile {
         background: transparent;
         border: 2px solid var(--primary-green);
@@ -274,6 +311,26 @@
                         {% if member.city %}{{ member.city }}, {% endif %}
                         {{ member.country|default:"" }}
                     </p>
+                    {% endif %}
+
+                    {% if member.facebook_url or member.linkedin_url or member.x_url %}
+                    <div class="member-social">
+                        {% if member.facebook_url %}
+                        <a href="{{ member.facebook_url }}" target="_blank" rel="noopener noreferrer" class="member-social-link member-social-facebook" title="{% trans 'Facebook' %}">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        {% endif %}
+                        {% if member.linkedin_url %}
+                        <a href="{{ member.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="member-social-link member-social-linkedin" title="{% trans 'LinkedIn' %}">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        {% endif %}
+                        {% if member.x_url %}
+                        <a href="{{ member.x_url }}" target="_blank" rel="noopener noreferrer" class="member-social-link member-social-x" title="{% trans 'X' %}">
+                            <i class="fa-brands fa-x-twitter"></i>
+                        </a>
+                        {% endif %}
+                    </div>
                     {% endif %}
 
                     <!-- View Profile Button (if detail page exists) -->

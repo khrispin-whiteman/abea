@@ -153,6 +153,7 @@ class ProfileUpdateForm(UserChangeForm):
         fields = ('title', 'first_name', 'last_name', 'email', 'phone',
                   'country', 'city', 'address', 'institution', 'position',
                   'specialization', 'professional_id', 'profile_picture',
+                  'facebook_url', 'linkedin_url', 'x_url',
                   'bio', 'language', 'payment_method')
         widgets = {
             'title': forms.Select(attrs={'class': 'form-control'}),
@@ -168,7 +169,18 @@ class ProfileUpdateForm(UserChangeForm):
             'position': forms.TextInput(attrs={'class': 'form-control'}),
             'specialization': forms.TextInput(attrs={'class': 'form-control'}),
             'professional_id': forms.TextInput(attrs={'class': 'form-control'}),
+            'facebook_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://facebook.com/username'}),
+            'linkedin_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://linkedin.com/in/username'}),
+            'x_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://x.com/username'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'language': forms.Select(attrs={'class': 'form-control'}),
             'payment_method': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        for field_name in CustomUser.SOCIAL_FIELDS:
+            setattr(instance, field_name, self.cleaned_data.get(field_name) or None)
+        if commit:
+            instance.save()
+        return instance

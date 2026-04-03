@@ -71,6 +71,26 @@
                             {% endif %}
                         </div>
 
+                        {% if user_profile.facebook_url or user_profile.linkedin_url or user_profile.x_url %}
+                        <div class="social-links">
+                            {% if user_profile.facebook_url %}
+                            <a href="{{ user_profile.facebook_url }}" target="_blank" rel="noopener noreferrer" class="social-link social-facebook" title="{% trans 'Facebook' %}">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            {% endif %}
+                            {% if user_profile.linkedin_url %}
+                            <a href="{{ user_profile.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="social-link social-linkedin" title="{% trans 'LinkedIn' %}">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            {% endif %}
+                            {% if user_profile.x_url %}
+                            <a href="{{ user_profile.x_url }}" target="_blank" rel="noopener noreferrer" class="social-link social-x" title="{% trans 'X' %}">
+                                <i class="fa-brands fa-x-twitter"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
                         <div class="d-flex flex-wrap gap-2 justify-content-center">
                             {% if is_own_profile %}
                             <a href="{% url 'edit_own_profile' %}" class="btn" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-red)); border: none; color: white;">
@@ -183,6 +203,16 @@
                                                 <th>{% trans "Specialization" %}:</th>
                                                 <td>{{ user_profile.specialization|default:"-" }}</td>
                                             </tr>
+                                            <tr>
+                                                <th>{% trans "Facebook" %}:</th>
+                                                <td>
+                                                    {% if user_profile.facebook_url %}
+                                                    <a href="{{ user_profile.facebook_url }}" target="_blank" rel="noopener noreferrer">{{ user_profile.facebook_url }}</a>
+                                                    {% else %}
+                                                    -
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
                                         </table>
                                     </div>
 
@@ -212,6 +242,26 @@
                                             <tr>
                                                 <th>{% trans "Language" %}:</th>
                                                 <td>{{ user_profile.get_language_display|default:"-" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "LinkedIn" %}:</th>
+                                                <td>
+                                                    {% if user_profile.linkedin_url %}
+                                                    <a href="{{ user_profile.linkedin_url }}" target="_blank" rel="noopener noreferrer">{{ user_profile.linkedin_url }}</a>
+                                                    {% else %}
+                                                    -
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>{% trans "X" %}:</th>
+                                                <td>
+                                                    {% if user_profile.x_url %}
+                                                    <a href="{{ user_profile.x_url }}" target="_blank" rel="noopener noreferrer">{{ user_profile.x_url }}</a>
+                                                    {% else %}
+                                                    -
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                         </table>
                                     </div>
@@ -507,6 +557,44 @@
         border-bottom: 3px solid var(--primary-green);
         background-color: white;
         font-weight: 600;
+    }
+
+    .social-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .social-link {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .social-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+        color: white;
+    }
+
+    .social-facebook {
+        background: #1877f2;
+    }
+
+    .social-linkedin {
+        background: #0077b5;
+    }
+
+    .social-x {
+        background: #111111;
     }
 
     /* Table Styling */

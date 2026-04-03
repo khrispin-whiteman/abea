@@ -347,6 +347,39 @@
                                 </div>
                                 {% endif %}
 
+                                <!-- Social Media -->
+                                {% if form.facebook_url or form.linkedin_url or form.x_url %}
+                                <div class="form-section mb-4">
+                                    <h5 class="border-bottom pb-2" style="color: var(--primary-green);">{% trans "Social Media" %}</h5>
+                                    <div class="row">
+                                        {% if form.facebook_url %}
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="id_facebook_url" class="form-label">{% trans "Facebook" %}</label>
+                                                {{ form.facebook_url }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.linkedin_url %}
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="id_linkedin_url" class="form-label">{% trans "LinkedIn" %}</label>
+                                                {{ form.linkedin_url }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if form.x_url %}
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="id_x_url" class="form-label">{% trans "X" %}</label>
+                                                {{ form.x_url }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
                                 <!-- Profile Information -->
                                 {% if form.profile_picture or form.bio %}
                                 <div class="form-section mb-4">
