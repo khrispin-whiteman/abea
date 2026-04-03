@@ -31,6 +31,13 @@
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
         }
 
+        .navbar > .container {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+        }
+
         .navbar-brand,
         .navbar-nav .nav-link,
         .navbar-nav .dropdown-toggle,
@@ -54,6 +61,8 @@
 
         .navbar-toggler {
             border-color: rgba(255, 255, 255, 0.5);
+            flex: 0 0 auto;
+            margin-left: auto;
         }
 
         .navbar-toggler:focus {
@@ -67,8 +76,11 @@
         .navbar-brand {
             display: flex !important;
             align-items: center !important;
-            gap: 0;
-            max-width: calc(100% - 70px);
+            gap: 0.45rem;
+            flex: 1 1 auto;
+            min-width: 0;
+            max-width: calc(100% - 56px);
+            margin-right: 0;
             text-decoration: none;
         }
 
@@ -95,21 +107,29 @@
         .site-title-wrapper {
             line-height: 1;
             min-width: 0;
+            flex: 1 1 auto;
+            overflow: visible;
         }
 
         .site-title {
-            font-size: 1.2rem;
-            line-height: 1.1;
+            display: block;
+            font-size: clamp(0.76rem, 1.1vw + 0.45rem, 1.08rem);
+            line-height: 1.08;
             margin: 0;
             white-space: normal;
+            letter-spacing: 0.01em;
         }
 
-        .site-title-mobile {
-            display: none;
-        }
-
-        .site-title-desktop {
+        .site-title-full,
+        .site-title-short {
             display: block;
+        }
+
+        .site-title-short {
+            display: none;
+            font-size: 0.92rem;
+            line-height: 1;
+            letter-spacing: 0.08em;
         }
 
         /* Language switcher */
@@ -177,6 +197,27 @@
 
         /* Mobile menu */
         @media (max-width: 991.98px) {
+            .navbar > .container {
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .navbar-brand {
+                order: 1;
+                max-width: calc(100% - 56px);
+            }
+
+            .navbar-toggler {
+                order: 2;
+            }
+
+            .navbar-collapse {
+                order: 3;
+                flex-basis: 100%;
+                width: 100%;
+                margin-top: 0.75rem;
+            }
+
             .navbar-nav {
                 padding: 1rem 0;
             }
@@ -190,11 +231,6 @@
                 width: 100%;
                 text-align: center;
             }
-
-            .navbar-collapse {
-                margin-top: 0.75rem;
-            }
-
             .user-mobile-wrapper {
                 margin-top: 0.75rem;
             }
@@ -211,38 +247,64 @@
         }
 
         @media (max-width: 576px) {
+            .navbar {
+                padding-top: 0.55rem;
+                padding-bottom: 0.55rem;
+            }
+
+            .navbar > .container {
+                gap: 0.35rem;
+            }
+
+            .navbar-brand {
+                max-width: calc(100% - 50px);
+                gap: 0.35rem;
+            }
+
             .language-dropdown-btn {
                 padding: 0.35rem 0.75rem;
                 font-size: 0.9rem;
             }
 
             .logo-container {
-                width: 42px;
-                height: 42px;
-                min-width: 42px;
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
             }
 
             .site-logo {
-                width: 42px;
-                height: 42px;
+                width: 36px;
+                height: 36px;
             }
 
             .site-title {
-                font-size: 0.78rem;
-                line-height: 1.05;
-            }
-
-            .site-title-mobile {
-                display: block;
-            }
-
-            .site-title-desktop {
-                display: none;
+                font-size: 0.85rem;
+                line-height: 1;
+                white-space: nowrap;
             }
 
             .site-title-wrapper {
-                margin-left: 0.5rem !important;
-                max-width: 190px;
+                display: flex !important;
+                align-items: center;
+                visibility: visible !important;
+                opacity: 1 !important;
+                margin-left: 0 !important;
+                max-width: none;
+                min-width: 4.2rem;
+                flex: 0 0 auto;
+            }
+
+            .site-title-full {
+                display: none !important;
+            }
+
+            .site-title-short {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                color: #fff !important;
+                font-size: 0.85rem;
+                font-weight: 700;
             }
 
             .user-name {
@@ -253,12 +315,16 @@
         }
 
         @media (max-width: 380px) {
-            .site-title-wrapper {
-                max-width: 150px;
+            .navbar-brand {
+                max-width: calc(100% - 46px);
             }
 
             .site-title {
-                font-size: 0.68rem;
+                font-size: 0.74rem;
+            }
+
+            .site-title-wrapper {
+                min-width: 3.6rem;
             }
 
             .user-name {
@@ -322,15 +388,13 @@
                 </div>
 
                 <div class="ms-2 ms-md-3 site-title-wrapper">
-                    <div class="text-white fw-bold site-title">
-                        <span class="site-title-mobile">
-                            Africa Biomedical<br>Engineering Alliance
+                    <span class="text-white fw-bold site-title">
+                        <span class="site-title-full">
+                            Africa Biomedical<br>
+                            Engineering Alliance
                         </span>
-                        <span class="site-title-desktop">
-                            <small>Africa Biomedical</small><br>
-                            <small>Engineering Alliance</small>
-                        </span>
-                    </div>
+                        <span class="site-title-short">ABEA</span>
+                    </span>
                 </div>
             </a>
 
